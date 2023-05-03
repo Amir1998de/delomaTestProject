@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class name="logic.entity.StoreRecommendation" table="store_recommendation">
+    <id name="id" type="int">
+      <column name="id" />
+      <generator class="native" />
+    </id>
+    
+    <property name="name" type="string">
+      
+    </property>
+    
+    <property name="description" type="string">
+      
+    </property>
+    
+    <property name="severity">
+         
+         <type name="org.hibernate.type.EnumType">
+	          <param name="enumClass">logic.entity.Severity</param>
+	          <param name="useNamed">true</param>
+         </type>
+    </property>
+    
+    <property name="active" type="boolean">
+      
+    </property>
+    
+    <property name="timeCreated" type="timestamp" update="false">
+
+    </property>
+  </class>
+</hibernate-mapping>

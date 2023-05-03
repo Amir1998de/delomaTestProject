@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+	 <h:head>
+	    <h:outputStylesheet name="styles/style.css"  />
+	    <title>StoreRecommendation</title>
+	 </h:head>
+     <h:body>
+	 	<h1>Store Recommendations - Memory</h1>
+	 	
+	 	 <p:toolbar>
+            <p:toolbarGroup>
+            	<h:form>
+                <p:commandButton value="New" icon="pi pi-plus" 
+	                styleClass="ui-button-success" style="margin-right: .5rem"
+	                action="#{recommendationBean.openNew}" process="@this"
+	                update=":formDialog:manageProductContent" 
+	                oncomplete="PF('manageProductDialogWidgetVar').show()"  >
+                    <p:resetInput target=":formDialog:manageProductContent" />
+                </p:commandButton>
+                </h:form>
+            </p:toolbarGroup>  
+        </p:toolbar>
+        <p:messages id="pageMessages" showDetail="true"/>
+        
+        
+        
+     <h:form id="formDialog">
+    
+        <p:dialog id="manageProductDialog" header="Recommendation" showEffect="fade" modal="true" widgetVar="manageProductDialogWidgetVar"
+            responsive="true">
+            
+            <p:outputPanel id="manageProductContent" class="ui-fluid">
+            
+       		     <p:messages id="dialogMessages" showDetail="true"/>
+                <p:outputPanel rendered="#{not empty recommendationBean.selectedItem}">
+                    
+                    <div class="field">
+                        <p:outputLabel for="name" value="Name"/>
+                        <p:inputText id="name" value="#{recommendationBean.selectedItem.name}" required="true" />
+                    </div>
+                    
+                   <div class="field">
+                        <p:outputLabel for="description" value="Description"/>
+                        <p:inputTextarea id="description" value="#{recommendationBean.selectedItem.description}" />
+                    </div>
+                    
+                    <div class="field">
+                        <p:outputLabel for="severity" value="Severity"/>
+                        <p:selectOneRadio id="severity" label="Severity" value="#{recommendationBean.selectedItem.severity}"
+                            layout="responsive" columns="2" >
+                            <f:selectItems value="#{recommendationBean.severities}" var="varSeverity" 
+                            	itemValue="#{varSeverity.toString()}" itemLabel="#{varSeverity.toString()}" />
+                        </p:selectOneRadio>
+                    </div> 
+                  <div class="field">
+                  	  
+                      <p:selectBooleanCheckbox id="active" label="Active" value="#{recommendationBean.selectedItem.active}">Active</p:selectBooleanCheckbox>
+                    </div> 
+                     
+              
+              
+                </p:outputPanel>
+            </p:outputPanel>
+            
+            <!-- save -->
+    		 <f:facet name="footer">
+                <p:commandButton id="btnSave" value="Save" icon="pi pi-check" 
+                	process="manageProductContent @this"
+                	action="#{recommendationBean.saveItem}" 
+                	update="manageProductContent my-table"
+                />
+               <!-- cancel --> 	
+                <p:button value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialogWidgetVar').hide()"
+                    class="ui-button-secondary"  />
+            </f:facet>
+            
+        </p:dialog>
+
+
+    </h:form>
+    
+    <h2>Table - Not lazy</h2>
+              
+              
+	 		<h:form id="formTableMemory">
+	 		
+				    <div class="my-table">
+				    
+				        <p:dataTable id="tblRec" var="tblVarRec" value="#{recommendationBean.items}" 
+				         paginator="true" rows="5" selectionMode="single" rowKey="#{tblVarRec.id}" paginatorPosition="bottom" selection="#{recommendationBean.selectedItem}">
+
+				            <p:column headerText="Name" sortBy="#{tblVarRec.name} " filterBy="#{tblVarRec.name}" >
+				                <h:outputText value="#{tblVarRec.name}" />
+				            </p:column>
+				
+				            <p:column headerText="Description" sortBy="#{tblVarRec.description} " filterBy="#{tblVarRec.description}">
+				                <h:outputText value="#{tblVarRec.description}" />
+				            </p:column>
+				
+				         <p:column headerText="Severity" sortBy="#{tblVarRec.severity} " filterBy="#{tblVarRec.severity}">
+				                <h:outputText value="#{tblVarRec.severity}" />
+				            </p:column>
+				            
+				          <p:column headerText="Active" sortBy="#{tblVarRec.active} " filterBy="#{tblVarRec.active}">
+				                <h:outputText value="#{tblVarRec.active}" />
+				            </p:column>
+				            
+				         <p:column exportable="false">
+				
+				   			 <!-- Edit -->
+			                 <p:commandButton icon="pi pi-pencil" update=":formDialog:manageProductContent"
+			                    oncomplete="PF('manageProductDialogWidgetVar').show()"
+			                    styleClass="edit-button rounded-button ui-button-success" process="@this">
+			                    
+			                    <f:setPropertyActionListener value="#{tblVarRec}" target="#{recommendationBean.selectedItem}" />
+			                    
+			                    <p:resetInput target=":formDialog:manageProductContent" />
+			                    
+			                </p:commandButton>
+			                <!-- Delete -->
+			                <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+			                                 process="@this"
+			                                 oncomplete="PF('deleteProductDialogWidgetVar').show()">
+			                                 
+			                    <f:setPropertyActionListener value="#{tblVarRec}" target="#{recommendationBean.selectedItem}" />
+			                </p:commandButton>
+			            </p:column>
+				            
+				            
+				            
+				            
+				        </p:dataTable>
+				    </div>
+				 
+				    <p:confirmDialog widgetVar="deleteProductDialogWidgetVar" showEffect="fade" width="300"
+			            message="Delete the product?" header="Confirm" severity="warn" >
+			            
+			            <p:commandButton value="Yes" icon="pi pi-check"
+			                process="@this" 
+			                action="#{recommendationBean.deleteItem}"
+			                update="@form"
+			                oncomplete="PF('deleteProductDialogWidgetVar').hide()" />
+			                
+			            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+			                onclick="PF('deleteProductDialogWidgetVar').hide()" />
+			                
+			        </p:confirmDialog>
+			</h:form>
+
+
+		<!-- Table Lazy -->
+    	<h2>Table - Lazy</h2>
+    	
+    	<h:form id="my-table">
+	 		<div class="my-table">
+			 	<p:dataTable var="tblVarRec" value="#{lazyView.lazyModel}" paginator="true" rows="4" selection="#{lazyView.selectedRecommendation}" 
+			 	 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink}">
+		                     
+				    <p:column headerText="Name" sortBy="#{tblVarRec.name}" filterBy="#{tblVarRec.name}">
+		                <h:outputText value="#{tblVarRec.name}"/>
+		            </p:column>
+		            <p:column headerText="Description" sortBy="#{tblVarRec.description}" filterBy="#{tblVarRec.description}">
+		               
+		                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+		                              value="#{tblVarRec.description}"/>
+		            </p:column>
+		            <p:column headerText="Severity" sortBy="#{tblVarRec.severity}" filterBy="#{tblVarRec.severity}">
+		                <h:outputText value="#{tblVarRec.severity}"/>
+		            </p:column>
+		            <p:column headerText="Active" sortBy="#{tblVarRec.active}"
+		                      filterBy="#{tblVarRec.active}">
+		               
+		                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+		                              value="#{tblVarRec.active}"/>
+		            </p:column>
+		            
+		             <!-- Edit -->
+		              <p:column exportable="false">
+			                 <p:commandButton icon="pi pi-pencil" update=":formDialog:manageProductContent"
+			                    oncomplete="PF('manageProductDialogWidgetVar').show()"
+			                    styleClass="edit-button rounded-button ui-button-success" process="@this">
+			                    
+			                    <f:setPropertyActionListener value="#{tblVarRec}" target="#{lazyView.selectedRecommendation}" />
+			                    
+			                    <p:resetInput target=":formDialog:manageProductContent" />
+			                    
+			                </p:commandButton>
+			                <!-- Delete -->
+			                <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+			                                 process="@this"
+			                                 oncomplete="PF('deleteProductDialogWidgetVar').show()">
+			                                 
+			                    <f:setPropertyActionListener value="#{tblVarRec}" target="#{lazyView.selectedRecommendation}" />
+			                </p:commandButton>
+			            </p:column>
+				           
+              </p:dataTable>
+	 		</div>
+	 				
+				  
+				 
+				    <p:confirmDialog widgetVar="deleteProductDialogWidgetVar" showEffect="fade" width="300"
+			            message="Delete the product?" header="Confirm" severity="warn" >
+			            
+			            <p:commandButton value="Yes" icon="pi pi-check"
+			                process="@this" 
+			                action="#{lazyView.deleteItem}"
+			                update="my-table"
+			                oncomplete="PF('deleteProductDialogWidgetVar').hide()" />
+			                
+			            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+			                onclick="PF('deleteProductDialogWidgetVar').hide()" />
+			                
+			        </p:confirmDialog>
+			</h:form>
+
+
+    </h:body>
+</html>
