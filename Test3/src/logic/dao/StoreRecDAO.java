@@ -2,11 +2,16 @@ package logic.dao;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.SortMeta;
+import org.primefaces.model.SortOrder;
 
 import logic.entity.StoreRecommendation;
 
 import org.hibernate.Session;
 import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 
 public class StoreRecDAO {
 	
@@ -53,11 +58,121 @@ public class StoreRecDAO {
 	        return storeRecommendations;
 	    }
 	    
-	    public List<StoreRecommendation> getList(int offset, int pageSize)
+	    public int getRowCount(Map<String, FilterMeta> filterBy)
 	    {
+	    	  Session session = sessionFactory.openSession();
+		        session.beginTransaction();
+		        String hql = "SELECT sr. FROM StoreRecommendation AS sr ";
+		       // String hql = "FROM StoreRecommendation ORDER BY description  ASC ";
+		       
+		        
+		        
+		        if (filterBy != null && !filterBy.isEmpty()) {
+		        	
+		        	StringJoiner sj = new StringJoiner(" AND ", " WHERE ", "");
+		        	
+		        	
+		            for (String fieldName : filterBy.keySet()) {
+		            	// for example description
+		                FilterMeta filter = filterBy.get(fieldName);
+		                
+		                String field = filter.getField();
+		                Object value = filter.getFilterValue();
+		                
+		                try {
+		                	  if (value != null) {
+		  
+		                            sj.add("sr." + field + " LIKE " + "'" +value + "%'");
+		                    }
+						} catch (Exception e) {
+							 throw new IllegalArgumentException("Unknown filter match mode: " + filter.getMatchMode());
+						}
+		              
+		                }
+		            
+		            hql += sj.toString();
+		            }
+	    	return 0;
 	    	
-	    	return null;
 	    }
+	    
+	    /*
+	     * getList
+	     */
+	    public List<StoreRecommendation> getList(int offset, int pageSize,Map<String, FilterMeta> filterBy,Map<String, 
+	    		SortMeta> sortBy)
+	    {
+	        Session session = sessionFactory.openSession();
+	        session.beginTransaction();
+	        String hql = "SELECT sr FROM StoreRecommendation AS sr ";
+	       // String hql = "FROM StoreRecommendation ORDER BY description  ASC ";
+	        String searchName = "abcd";
+	        
+	       
+	     
+	        // filter 
+	        
+	        if (filterBy != null && !filterBy.isEmpty()) {
+	        	
+	        	StringJoiner sj = new StringJoiner(" AND ", " WHERE ", "");
+	        	
+	        	
+	            for (String fieldName : filterBy.keySet()) {
+	            	// for example description
+	                FilterMeta filter = filterBy.get(fieldName);
+	                
+	                String field = filter.getField();
+	                Object value = filter.getFilterValue();
+	                
+	                try {
+	                	  if (value != null) {
+	  
+	                            sj.add("sr." + field + " LIKE " + "'" +value + "%'");
+	                    }
+					} catch (Exception e) {
+						 throw new IllegalArgumentException("Unknown filter match mode: " + filter.getMatchMode());
+					}
+	              
+	                }
+	            
+	            hql += sj.toString();
+	            }
+	      
+	        
+	       // sort 
+	       if (sortBy != null && !sortBy.isEmpty()) {
+	    	   
+	    	   StringJoiner sj = new StringJoiner(" , ", " ORDER BY ", "");
+	    	   
+	            for (String fieldName : sortBy.keySet()) {
+	                SortMeta sortMeta = sortBy.get(fieldName);
+	                
+	                sj.add("sr." +  sortMeta.getField() + " " +  sortOrderConvertor(sortMeta.getOrder()));
+	               
+	            }
+	            hql += sj.toString();
+	        } 
+	        
+	        
+	     // HQL * 
+	        Query<StoreRecommendation> query =  session.createQuery(hql);
+	        query.setFirstResult(offset);
+	        query.setMaxResults(pageSize);
+	        List<StoreRecommendation> results = query.list();
+	       
+	        session.getTransaction().commit();
+	    	return results;
+	    }
+	    
+	    String sortOrderConvertor(SortOrder s){
+	    	if(s.equals(s.ASCENDING)){
+	    		return "ASC";
+	    	}else if(s.equals(s.DESCENDING)){
+	    		return "DESc";
+	    	}else{
+	    		return "";
+	    	}
+        }
 	    
 	    /*
 	     * delete

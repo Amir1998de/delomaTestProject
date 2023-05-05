@@ -157,7 +157,7 @@
     	
     	<h:form id="my-table">
 	 		<div class="my-table">
-			 	<p:dataTable var="tblVarRec" value="#{lazyView.lazyModel}" paginator="true" rows="4" selection="#{lazyView.selectedRecommendation}" 
+			 	<p:dataTable var="tblVarRec" value="#{lazyViewBean.lazyModel}" paginator="true" rows="4" selection="#{lazyViewBean.selectedRecommendation}" 
 			 	 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink}">
 		                     
 				    <p:column headerText="Name" sortBy="#{tblVarRec.name}" filterBy="#{tblVarRec.name}">

@@ -34,13 +34,14 @@ public class LazyStoreRecDataModelDAO extends LazyDataModel<StoreRecommendation>
 	 * properties
 	 */
 
-	private StoreRecDAO dao;
+	private StoreRecDAO storeRecDAO;
 	
+	private List<StoreRecommendation> datasource;
 	/*
 	 * constructor 
 	 */
 	 public LazyStoreRecDataModelDAO(StoreRecDAO dao) {
-	        this.dao = dao;
+	        this.storeRecDAO = dao;
 	    }
 	 
 	 /*
@@ -58,31 +59,39 @@ public class LazyStoreRecDataModelDAO extends LazyDataModel<StoreRecommendation>
 
 	@Override
 	public int count(Map<String, FilterMeta> filterBy) {
-	
-		throw new UnsupportedOperationException();
+		return 100;
+		
 	}
 	
 	
 	 /*
 	  * load
+	  * 
+	  * First is offset = 0 and pageSize = 4 so it will show object with Index 0,1,2,3
+	  * if I select next page in paginator, is offset = 4 and pageSize = 4  so it will show object with Index 4,5,6,7
+	  * And it continues...
 	  */
 	
 	@Override
 	public List<StoreRecommendation> load(int offset, int pageSize, Map<String, SortMeta> sortBy,
 			Map<String, FilterMeta> filterBy) {
 		 
-		List<StoreRecommendation> storeRecommendation = this.dao.getList(offset, pageSize);
+		   datasource = this.storeRecDAO.getList(offset, pageSize,filterBy,sortBy);
+		 //	datasource = this.storeRecDAO.getAll();
 		
 		// this.dao.getAll()
 		
-		System.out.println("storeRecommendation.size: " + storeRecommendation.size());
+		System.out.println("storeRecommendation.size: " + datasource.size());
+		System.out.println("storeRecommendation.offset: " + offset +"storeRecommendation.pageSize: " + pageSize);
+		System.out.println("storeRecommendation.filterBy: " + filterBy);
+		System.out.println("storeRecommendation.sortBy: " + sortBy);
 		
 		 /*
 		  * filters and paginatorTemplate control
 		  */
 		
 
-		return storeRecommendation;
+		return datasource;
 		
 	}
 	

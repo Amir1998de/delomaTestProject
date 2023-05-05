@@ -1,4 +1,4 @@
-package site.model;
+package site.beans;
 
 import java.io.Serializable;
 
@@ -21,10 +21,11 @@ import org.primefaces.model.LazyDataModel;
 import logic.dao.StoreRecDAO;
 import logic.entity.Severity;
 import logic.entity.StoreRecommendation;
+import site.model.LazyStoreRecDataModelDAO;
 
-@Named(value="lazyView")
+@Named(value="lazyViewBean")
 @ViewScoped
-public class LazyView implements Serializable {
+public class LazyViewBean implements Serializable {
 	
 
 	private static final long serialVersionUID = 1649123465069154870L;
@@ -49,8 +50,15 @@ public class LazyView implements Serializable {
 	
     @PostConstruct
     public void init() {
-    	 StoreRecDAO recommendationDAO = new StoreRecDAO(this.sessionFactory);
-         this.lazyModel = new LazyStoreRecDataModelMemory(recommendationDAO.getAll()) ;
+    	 StoreRecDAO storeRecDAO = new StoreRecDAO(this.sessionFactory);
+    	 /*
+    	  * send a List<StoreRecommendation>
+    	  *
+          * this.lazyModel = new LazyStoreRecDataModelMemory(storeRecDAO.getAll()) ;
+          */
+    	 
+    	 this.lazyModel = new LazyStoreRecDataModelDAO(storeRecDAO);
+    	 
     }
     
     /*
@@ -73,7 +81,7 @@ public class LazyView implements Serializable {
     public void saveItem() {
     	System.out.print("RecommendationBean.saveItem");	
     	
-    		StoreRecDAO recommendationDAO = new StoreRecDAO(this.sessionFactory);
+    		StoreRecDAO storeRecDAO = new StoreRecDAO(this.sessionFactory);
     		
     			try {
 	    				if(selectedRecommendation.getId() == 0){
@@ -81,12 +89,12 @@ public class LazyView implements Serializable {
 									selectedRecommendation.getDescription(),
 									selectedRecommendation.getSeverity(),
 									selectedRecommendation.isActive());
-							recommendationDAO.save(recommendation);	 
+							storeRecDAO.save(recommendation);	 
 							FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Added"));
 							PrimeFaces.current().ajax().update("pageMessages");
 							PrimeFaces.current().executeScript("PF('manageProductDialogWidgetVar').hide()");
 	    				}else{
-	    	    			recommendationDAO.update(this.selectedRecommendation);
+	    	    			storeRecDAO.update(this.selectedRecommendation);
 	    	    			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product updated"));
 	    	                PrimeFaces.current().ajax().update("pageMessages");
 	    	                PrimeFaces.current().executeScript("PF('manageProductDialogWidgetVar').hide()");
@@ -107,8 +115,8 @@ public class LazyView implements Serializable {
      */
     public void deleteItem(){
     	try {
-    			StoreRecDAO recommendationDAO = new StoreRecDAO(this.sessionFactory);
-    			recommendationDAO.delete(this.selectedRecommendation);
+    			StoreRecDAO storeRecDAO = new StoreRecDAO(this.sessionFactory);
+    			storeRecDAO.delete(this.selectedRecommendation);
     	        this.selectedRecommendation = null;
     	        
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product deleted"));
