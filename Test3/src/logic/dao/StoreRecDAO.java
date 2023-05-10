@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringJoiner;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -14,47 +18,57 @@ import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
 
 import logic.entity.StoreRecommendation;
+import site.beans.SessionFactoryBean;
 
-public class StoreRecDAO {
+public class StoreRecDAO 
+{
 
 	/*
 	 * properties
 	 */
-
-	public static Map<String, FilterMeta> filterByMap(final String field, final String filterValue) {
-		final Map<String, FilterMeta> filterBy = new HashMap<>();
-		if (filterValue != null && !filterValue.isEmpty()) {
-			final FilterMeta filter = new FilterMeta();
-			filter.setFilterValue(filterValue);
-			filter.setMatchMode(org.primefaces.model.MatchMode.STARTS_WITH);
-			filterBy.put(field, filter);
-		}
-
-		return filterBy;
-
-	}
+	
+	private final SessionFactory sessionFactory;
+	
+	
+	
 
 	/*
 	 * main
 	 */
-	public static void main(final String[] args) {
-
+	public static void main(final String[] args) 
+	{
+		/*
+		 * A Map allows you to store and access key-value pairs
+		 * Create a HashMap with String keys and Object values
+		 * Add key-value pairs to the Map with put
+		 *  Retrieve a value based on the key with get for example Object o = filters.get("name");
+		 */
 		final Map<String, Object> filters = new HashMap<>();
-		filters.put("name", "f");
-		filters.put("description", "a");
+		
+		final Map<String, SortOrder> sorts = new HashMap<>();
+		filters.put("name", "Pay");
+		//filters.put("description", "p");
+		sorts.put("name", SortOrder.DESCENDING);
+		
+		// ?? 
+		final StoreRecDAO dao = new StoreRecDAO(SessionFactoryBean.createSessionFactory());
+		
+		final List<StoreRecommendation> storeRecs = dao.testFilterHQL(filters,sorts);
 
-		final StoreRecDAO dao = null;
-
-		final List<StoreRecommendation> storeRecs = dao.testFilterHQL(filters);
-
+		
+		
+		
 		// sysstem out
+		System.out.println("Name");
+		storeRecs.forEach(action -> System.out.println(action.getName()));
+		System.out.println("");
+		System.out.println("Description");
+		storeRecs.forEach(action -> System.out.println(action.getDescription()));
 	}
 
-	/*
-	 * method
-	 */
 
-	private final SessionFactory sessionFactory;
+
+	
 
 	/*
 	 * constructor
@@ -63,6 +77,10 @@ public class StoreRecDAO {
 		this.sessionFactory = sessionFactory;
 	}
 
+	
+	/*
+	 * method
+	 */
 	/**
 	 * delete
 	 *
@@ -115,19 +133,18 @@ public class StoreRecDAO {
 	 * getList
 	 */
 	public List<StoreRecommendation> getList(final int offset, final int pageSize, final Map<String, Object> filters,
-			final Map<String, SortMeta> sortBy) {
+			final Map<String, SortOrder> sortBy) 
+	{
 		final Session session = this.sessionFactory.openSession();
 		session.beginTransaction();
 
-		// SELECT + WHERE
-		String hql = this.createHQL(filters, false);
-
-		// ORDER BY
-		hql += StoreRecDAO.createHQL(sortBy);
+		// createHql -> Select / where / SortBy 
+		String hql  = DaoUtil.createHql(StoreRecommendation.class, "sr", false, filters, sortBy);
+	    	
 
 		final Query<StoreRecommendation> query = session.createQuery(hql, StoreRecommendation.class);
 		// add params to query
-		StoreRecDAO.addQueryParams(query, filters);
+		DaoUtil.addQueryParams(query, filters);
 
 		System.out.println("StoreRecDAO//getList.hql : " + hql);
 
@@ -143,17 +160,18 @@ public class StoreRecDAO {
 
 	/*
 	 * getRowCount
+	 * 
 	 */
 	public int getRowCount(final Map<String, Object> filters) {
 		final Session session = this.sessionFactory.openSession();
 		session.beginTransaction();
 
-		// SELECT + WHERE
-		final String hql = this.createHQL(filters, true);
+		// createHql -> Select / where / null 
+		String hql  = DaoUtil.createHql(StoreRecommendation.class, "sr", true, filters, null);
 
 		final Query<Long> query = session.createQuery(hql, Long.class);
 
-		StoreRecDAO.addQueryParams(query, filters);
+		DaoUtil.addQueryParams(query, filters);
 
 		final Long count = query.uniqueResult();
 		session.getTransaction().commit();
@@ -178,50 +196,21 @@ public class StoreRecDAO {
 	 * testFilterHQL
 	 */
 
-	public String createHQL(final Map<String, Object> filters, final boolean count) {
+	
 
-		String hql = "SELECT " + (count ? "COUNT(*)" : "sr") + " FROM StoreRecommendation AS sr ";
-
-		// add filter to hql
-		if (filters != null && !filters.isEmpty()) {
-
-			final StringJoiner sj = new StringJoiner(" AND ", " WHERE ", "");
-
-			for (final Entry<String, Object> filter : filters.entrySet()) {
-
-				final String field = filter.getKey();
-				final Object value = filter.getValue();
-
-				if (value != null) {
-					// sj.add("sr." + field + " LIKE " + "'" + value +
-					// "%'");
-					sj.add("sr." + field + " LIKE ?param0");
-
-				}
-			}
-
-			hql += sj.toString();
-
-			// query = session.createQuery(hql).setParameter("param0", value +
-			// "%");
-		}
-
-		return hql;
-	}
-
-	public List<StoreRecommendation> testFilterHQL(final Map<String, Object> filters) {
+	public List<StoreRecommendation> testFilterHQL(final Map<String, Object> filters,final Map<String, SortOrder> sortBy) {
 
 		final Session session = this.sessionFactory.openSession();
 		session.beginTransaction();
-
-		final String hql = this.createHQL(filters, false);
-
-		// a) HQL Query
+		
+		// createHql -> Select / where / SortBy
+		String hql  = DaoUtil.createHql(StoreRecommendation.class, "sr", false, filters, sortBy);
+		
+		
 		final Query<StoreRecommendation> query = session.createQuery(hql, StoreRecommendation.class);
-
+	
 		// add params to query
-
-		StoreRecDAO.addQueryParams(query, filters);
+		DaoUtil.addQueryParams(query, filters);
 
 		final List<StoreRecommendation> storeRecommendations = query.list();
 
@@ -230,7 +219,17 @@ public class StoreRecDAO {
 	}
 
 	public StoreRecommendation testFilterCriteria(final long id) {
-		return null;
+	
+		final Session session = this.sessionFactory.openSession();
+		session.beginTransaction();
+		
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<StoreRecommendation> criteria = builder.createQuery(StoreRecommendation.class);
+		Root<StoreRecommendation> root = criteria.from(StoreRecommendation.class);
+		
+		//FilterCriteria titleCriteria = builder.like(root.get("name"), "%" + id + "%");
+		
+	return null;
 	}
 
 	public List<StoreRecommendation> testFilterCriteria(final Map<String, Object> filters) {
@@ -265,43 +264,20 @@ public class StoreRecDAO {
 
 	}
 
-	public static <T> void addQueryParams(final Query<T> query, final Map<String, Object> params) {
-		if (params != null && !params.isEmpty()) {
-			int index = 0;
-			for (final Entry<String, Object> entry : params.entrySet()) {
+	/*
+	 * HQL
+	 */
+	
+	
+	
+	
 
-				final Object value = entry.getValue();
-				if (value != null) {
-					query.setParameter("param" + index, value + "%");
-					index++;
-				}
-			}
-		}
-	}
 
-	public static String createHQL(final Map<String, SortMeta> sortBy) {
+	
 
-		String hql = "";
-		// sort
-		if (sortBy != null && !sortBy.isEmpty()) {
-			final StringJoiner sj = new StringJoiner(" , ", " ORDER BY ", "");
-			for (final String fieldName : sortBy.keySet()) {
-				final SortMeta sortMeta = sortBy.get(fieldName);
-				sj.add("sr." + sortMeta.getField() + " " + StoreRecDAO.sortOrderConvertor(sortMeta.getOrder()));
-			}
-			hql += sj.toString();
-		}
 
-		return hql;
-	}
 
-	public static String sortOrderConvertor(final SortOrder s) {
-		if (s.equals(SortOrder.ASCENDING)) {
-			return "ASC";
-		} else if (s.equals(SortOrder.DESCENDING)) {
-			return "DESc";
-		} else {
-			return "";
-		}
-	}
+	
+	
+
 }

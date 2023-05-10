@@ -59,6 +59,7 @@ public class LazyStoreRecDataModelDAO extends LazyDataModel<StoreRecommendation>
 		System.out.println("LazyStoreRecDataModelDAO//getRowKey : " + String.valueOf(storeRecommendation.getId()));
 		return String.valueOf(storeRecommendation.getId());
 	}
+	
 
 	/*
 	 * load
@@ -73,7 +74,9 @@ public class LazyStoreRecDataModelDAO extends LazyDataModel<StoreRecommendation>
 			final Map<String, FilterMeta> filterBy) {
 
 		final Map<String, Object> filters = ShowcaseUtil.convertFilters(filterBy);
-		this.datasource = this.storeRecDAO.getList(offset, pageSize, filters, sortBy);
+		
+		// TODO convert SortMeta - so that logic namespace does not know about PrimeFaces
+		this.datasource = this.storeRecDAO.getList(offset, pageSize, filters, null);
 		// datasource = this.storeRecDAO.getAll();
 
 		System.out.println("LazyStoreRecDataModelDAO//load.size : " + this.datasource.size());
