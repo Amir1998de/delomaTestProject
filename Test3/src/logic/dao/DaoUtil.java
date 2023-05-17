@@ -1,13 +1,25 @@
 package logic.dao;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 import java.util.StringJoiner;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.primefaces.model.SortOrder;
+
+import logic.entity.StoreRecommendation;
 
 public class DaoUtil {
 	public DaoUtil() {
@@ -26,7 +38,12 @@ public class DaoUtil {
 				final String field = filter.getKey();
 				final Object value = filter.getValue();
 				if (value != null)
-					sj.add(alias + "." + field + " LIKE CONCAT(" + DaoUtil.createParamName(field, true) + ", '%')");
+					if(value instanceof String){
+						sj.add(alias + "." + field + " LIKE CONCAT(" + DaoUtil.createParamName(field, true) + ", '%')");
+					}else {
+						sj.add(alias + "." + field + " = "  + DaoUtil.createParamName(field, true) );
+					}
+					
 			}
 			hql += sj.toString();
 			System.out.println("StoreRecDAO//createHQL.hql : " + hql);
@@ -94,6 +111,105 @@ public class DaoUtil {
 	public static String createParamName(final String field, final boolean colon) {
 		return (colon ? ":" : "") + "param_" + field;
 	}
+	
+	/*
+	 * createCriteriaWhere
+	 */
+	public static <T> Predicate createCriteriaWhere(CriteriaBuilder builder, Root<T> root, final Map<String, Object> filters) 
+	{
+		
+		
+		final List<Predicate> predicates = new ArrayList<>();
+		for (final Map.Entry<String, Object> entry : filters.entrySet()) {
+			final String field = entry.getKey();
+			final Object value = entry.getValue();
+			//predicates.add(builder.equal(root.get(field), value));
+			
+			if(value instanceof String){
+				predicates.add(builder.like(root.get(field),"%"+ value + "%"));
+			}else{
+				predicates.add(builder.equal(root.get(field), value));
+			}
+			
+		}
+
+		// (name = "test") AND (description = "p")
+		final Predicate predicateAnd = builder.and(predicates.toArray(new Predicate[0]));
+		return predicateAnd;
+	}
+	
+	
+	/*
+	 * createCriteriaOrderBy
+	 */
+	public static <T> List<Order> createCriteriaOrderBy(CriteriaBuilder builder,final Map<String, SortOrder> sortBy,
+		Root<T> root) 
+	{
+		// sortBy
+		final List<Order> orders = new ArrayList<>();
+		if (sortBy != null && !sortBy.isEmpty()) {
+			for (final Map.Entry<String, SortOrder> entry : sortBy.entrySet()) {
+				final String field = entry.getKey();
+				final SortOrder sortOrder = entry.getValue();
+				
+				// name, id
+				final Expression<?> expression = root.get(field);
+
+				final Order order = sortOrder == SortOrder.ASCENDING ? builder.asc(expression) : builder.desc(expression);
+				orders.add(order);
+			}
+		}
+			return orders;
+	}
+	
+	public static <T> T getEntity(Session session, Class<T> entity, long id)
+	{
+		return null;
+	}
+	
+	/*
+	 * createCriteria
+	 */
+	public static <T> CriteriaQuery<T> createCriteriaList(final Class<T> entityClass, Session session,
+		final Map<String, Object> filters, final Map<String, SortOrder> sortBy) {
+
+		// create CriteriaQuery
+		final CriteriaBuilder builder = session.getCriteriaBuilder();
+		final CriteriaQuery<T> criteria = builder.createQuery(entityClass);
+		final Root<T> root = criteria.from(entityClass);
+		
+		createCriteria(builder, criteria, root, filters, sortBy);
+
+		// projections COUNT, SUM,   
+		// select
+		// criteria.
+		criteria.select(root);
+
+		
+		
+	return criteria;
+}
+	
+	// createCriteriaRowCount
+	
+	
+	public static <T> CriteriaQuery<T> createCriteria(CriteriaBuilder builder, final CriteriaQuery<T> criteria, Root<T> root, 
+		final Map<String, Object> filters, final Map<String, SortOrder> sortBy) {
+
+		// where
+		
+		criteria.where(DaoUtil.createCriteriaWhere(builder, root, filters));
+		
+		// Order
+		List<Order> orders = new ArrayList<>();
+		orders=DaoUtil.createCriteriaOrderBy(builder, sortBy, root);
+		if (!orders.isEmpty()) {
+			criteria.orderBy(orders);
+		}
+		
+		
+	return criteria;
+}
 
 	// save
 	public static void saveEntity(final Object entity, final SessionFactory sf) {

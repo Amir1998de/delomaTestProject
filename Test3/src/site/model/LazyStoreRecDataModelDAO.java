@@ -6,6 +6,7 @@ import java.util.Map;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
+import org.primefaces.model.SortOrder;
 
 import logic.dao.StoreRecDAO;
 import logic.entity.StoreRecommendation;
@@ -74,9 +75,9 @@ public class LazyStoreRecDataModelDAO extends LazyDataModel<StoreRecommendation>
 			final Map<String, FilterMeta> filterBy) {
 
 		final Map<String, Object> filters = ShowcaseUtil.convertFilters(filterBy);
-		
+		final Map<String, SortOrder> sorts = ShowcaseUtil.convertSorts(sortBy);
 		// TODO convert SortMeta - so that logic namespace does not know about PrimeFaces
-		this.datasource = this.storeRecDAO.getList(offset, pageSize, filters, null);
+		this.datasource = this.storeRecDAO.getList(offset, pageSize, filters, sorts);
 		// datasource = this.storeRecDAO.getAll();
 
 		System.out.println("LazyStoreRecDataModelDAO//load.size : " + this.datasource.size());
