@@ -182,6 +182,7 @@ public class DaoUtil {
 
 		criteria.select(root);
 
+		// criteria.select(countSubquery.getSelection());
 		return criteria;
 	}
 

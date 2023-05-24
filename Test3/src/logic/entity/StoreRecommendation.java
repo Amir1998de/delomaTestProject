@@ -7,6 +7,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraints.Length;
+
 public class StoreRecommendation {
 
 	public StoreRecommendation(final String name, final String description, @NotNull final Severity severity,
@@ -28,6 +30,7 @@ public class StoreRecommendation {
 
 	@NotNull
 	@Pattern(regexp = ".{10,}", message = "description should not be less than 10")
+	@Length(min = 10)
 	private String description;
 
 	@NotNull
