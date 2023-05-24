@@ -5,95 +5,104 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
-
+import javax.validation.constraints.Pattern;
 
 public class StoreRecommendation {
 
-
-	    public StoreRecommendation(String name, String description, @NotNull Severity severity, boolean active) {
+	public StoreRecommendation(final String name, final String description, @NotNull final Severity severity,
+			final boolean active) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.severity = severity;
 		this.active = active;
-		
+
 	}
 
-	    @NotNull
-		private int id;
-	    
-	    @NotNull
-	    @Column(unique = true)
-	    private String name;
-	    
-	    @NotNull
-	    private String description;  
-	    
-		@NotNull
-	    private Severity severity;
-	    
-		@NotNull
-	    private boolean active;
-		
-		@NotNull
-	    private Date timeCreated=new Date();
+	@NotNull
+	private int id;
 
-	    public StoreRecommendation(){
-	    	
-	    }
-	    
-		public int getId() {
-			return id;
-		}
+	@NotNull
+	@Column(unique = true)
+	private String name;
 
-		public void setId(int id) {
-			this.id = id;
-		}
+	@NotNull
+	@Pattern(regexp = ".{10,}", message = "description should not be less than 10")
+	private String description;
 
-		public String getName() {
-			return name;
-		}
+	@NotNull
+	private Severity severity;
 
-		public void setName(String name) {
-			this.name = name;
-		}
+	@NotNull
+	private boolean active;
 
-		public String getDescription() {
-			return description;
-		}
+	@NotNull
+	private Date timeCreated = new Date();
 
-		public void setDescription(String description) {
-			this.description = description;
-		}
+	@NotNull
+	@Min(value = 0, message = "priority should not be less than 0")
+	private int priority;
 
-		public Severity getSeverity() {
-			return severity;
-		}
+	public int getPriority() {
+		return this.priority;
+	}
 
-		public void setSeverity(Severity severity) {
-			this.severity = severity;
-		}
+	public void setPriority(final int priority) {
+		this.priority = priority;
+	}
 
-		public boolean isActive() {
-			return active;
-		}
+	public StoreRecommendation() {
 
-		public void setActive(boolean active) {
-			this.active = active;
-		}
+	}
 
-		public Date getTimeCreated() {
-			return timeCreated;
-		}
+	public int getId() {
+		return this.id;
+	}
 
-		public void setTimeCreated(Date timeCreated) {
-			this.timeCreated = timeCreated;
-		}
+	public void setId(final int id) {
+		this.id = id;
+	}
 
-	    
-	    // Konstruktor, Getter und Setter
-	    
-	    
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
+	}
+
+	public Severity getSeverity() {
+		return this.severity;
+	}
+
+	public void setSeverity(final Severity severity) {
+		this.severity = severity;
+	}
+
+	public boolean isActive() {
+		return this.active;
+	}
+
+	public void setActive(final boolean active) {
+		this.active = active;
+	}
+
+	public Date getTimeCreated() {
+		return this.timeCreated;
+	}
+
+	public void setTimeCreated(final Date timeCreated) {
+		this.timeCreated = timeCreated;
+	}
+
+	// Konstruktor, Getter und Setter
 
 }

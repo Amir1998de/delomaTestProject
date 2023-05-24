@@ -43,9 +43,13 @@
                         <p:inputText id="name" value="#{recommendationBean.selectedItem.name}" required="true" />
                     </div>
                     
+        <!-- description -->
                    <div class="field">
                         <p:outputLabel for="description" value="Description"/>
-                        <p:inputTextarea id="description" value="#{recommendationBean.selectedItem.description}" />
+                        
+                        <p:inputTextarea id="description" value="#{recommendationBean.selectedItem.description}">
+                        <f:validateLength minimum="10" />
+                        </p:inputTextarea>
                     </div>
                     
                     <div class="field">
@@ -56,12 +60,22 @@
                             	itemValue="#{varSeverity.toString()}" itemLabel="#{varSeverity.toString()}" />
                         </p:selectOneRadio>
                     </div> 
+
                   <div class="field">
                   	  
                       <p:selectBooleanCheckbox id="active" label="Active" value="#{recommendationBean.selectedItem.active}">Active</p:selectBooleanCheckbox>
                     </div> 
                      
-              
+                       <!-- Priority -->
+                  <div class="field">  
+                    <p:outputLabel  value="Priority"/>          
+                    <h:panelGrid columns="1" style="margin-bottom: 10px">
+                    
+			            <p:inputText id="priority" value="#{recommendationBean.selectedItem.priority}" />
+			            <p:slider for="priority" step="1" maxValue="5"/>
+			            
+			        </h:panelGrid>
+            	 </div>    
               
                 </p:outputPanel>
             </p:outputPanel>
@@ -107,6 +121,10 @@
 				            
 				          <p:column headerText="Active" sortBy="#{tblVarRec.active} " filterBy="#{tblVarRec.active}">
 				                <h:outputText value="#{tblVarRec.active}" />
+				            </p:column>
+				            
+				            <p:column headerText="Priority " sortBy="#{tblVarRec.priority} " filterBy="#{tblVarRec.priority}">
+				                <h:outputText value="#{tblVarRec.priority}" />
 				            </p:column>
 				            
 				         <p:column exportable="false">
@@ -176,6 +194,14 @@
 		               
 		                <h:outputText style="vertical-align: middle; margin-left: .5rem"
 		                              value="#{tblVarRec.active}"/>
+		            </p:column>
+		            
+		              <!-- Priority -->
+		         <p:column headerText="Priority" sortBy="#{tblVarRec.priority}"
+		                      filterBy="#{tblVarRec.priority}">
+		               
+		                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+		                              value="#{tblVarRec.priority}"/>
 		            </p:column>
 		            
 		             <!-- Edit -->

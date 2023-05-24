@@ -1,16 +1,11 @@
 package logic.dao;
 
-import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.Session;
@@ -18,7 +13,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.primefaces.model.SortOrder;
 
-import logic.entity.Severity;
 import logic.entity.StoreRecommendation;
 import site.beans.SessionFactoryBean;
 
@@ -38,15 +32,15 @@ public class StoreRecDAO {
 		final Map<String, Object> filters = new HashMap<>();
 
 		final Map<String, SortOrder> sorts = new HashMap<>();
-		filters.put("active", true);
-		//filters.put("description", "D");
+		filters.put("name", "test");
+		// filters.put("description", "D");
 		sorts.put("name", SortOrder.ASCENDING);
-		//sorts.put("description", SortOrder.DESCENDING);
+		// sorts.put("description", SortOrder.DESCENDING);
 
 		final StoreRecDAO dao = new StoreRecDAO(SessionFactoryBean.createSessionFactory());
 
 		// 1. test creiteria single
-		final StoreRecommendation storeRecCriteria = dao.testFilterCriteria(85);
+		final StoreRecommendation storeRecCriteria = dao.testFilterCriteria(86);
 		System.out.println(storeRecCriteria.getName());
 
 		// 2. test criteria list dynamic
@@ -54,10 +48,11 @@ public class StoreRecDAO {
 
 		// sysstem out
 
-		storeRecsCriteria.forEach(action -> System.out.println("name : " + action.getName() + "\t Description : "+ action.getDescription()));
+		storeRecsCriteria.forEach(action -> System.out
+				.println("name : " + action.getName() + "\t Description : " + action.getDescription()));
 
 		System.out.println("RowCount : " + dao.getRowCount(filters));
-		
+
 		/*
 		 * A Map allows you to store and access key-value pairs Create a HashMap
 		 * with String keys and Object values Add key-value pairs to the Map
@@ -143,32 +138,33 @@ public class StoreRecDAO {
 		final Session session = this.sessionFactory.openSession();
 		session.beginTransaction();
 		// CriteriaAPI
-		
-		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,session, filters, sortBy);
-		Query<StoreRecommendation> query = session.createQuery(criteria);
+
+		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
+				session, filters, sortBy, false);
+		final Query<StoreRecommendation> query = session.createQuery(criteria);
 		query.setFirstResult(offset);
 		query.setMaxResults(pageSize);
 		System.out.println("StoreRecDAO//getList.CriteriaAPI : ");
 		final List<StoreRecommendation> results = query.getResultList();
-		
+
 		// Query<StoreRecommendation> query = null;
-		//if (criteria)
+		// if (criteria)
 		{
-			
+
 		}
-		
+
 		// setFirst
-		
+
 		// HQL :
 		/*
-		// createHql -> Select / where / SortBy
-		final String hql = DaoUtil.createHql(StoreRecommendation.class, "sr", false, filters, sortBy);
-		final Query<StoreRecommendation> query = session.createQuery(hql, StoreRecommendation.class);
-		// add params to query
-		DaoUtil.addQueryParams(query, filters);
-		
+		 * // createHql -> Select / where / SortBy final String hql =
+		 * DaoUtil.createHql(StoreRecommendation.class, "sr", false, filters,
+		 * sortBy); final Query<StoreRecommendation> query =
+		 * session.createQuery(hql, StoreRecommendation.class); // add params to
+		 * query DaoUtil.addQueryParams(query, filters);
+		 *
 		 */
-		
+
 		session.getTransaction().commit();
 		return results;
 	}
@@ -180,26 +176,25 @@ public class StoreRecDAO {
 	public int getRowCount(final Map<String, Object> filters) {
 		final Session session = this.sessionFactory.openSession();
 		session.beginTransaction();
-		
 
 		// create CriteriaQuery
-		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,session,filters,null);
+		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
+				session, filters, null, true);
 		// criteria
 		return session.createQuery(criteria).getResultList().size();
-		
-		
+
 		/*
-		// createHql -> Select / where / null
-		final String hql = DaoUtil.createHql(StoreRecommendation.class, "sr", true, filters, null);
-
-		final Query<Long> query = session.createQuery(hql, Long.class);
-
-		DaoUtil.addQueryParams(query, filters);
-
-		final Long count = query.uniqueResult();
-		session.getTransaction().commit();
-		return count.intValue();
-*/
+		 * // createHql -> Select / where / null final String hql =
+		 * DaoUtil.createHql(StoreRecommendation.class, "sr", true, filters,
+		 * null);
+		 *
+		 * final Query<Long> query = session.createQuery(hql, Long.class);
+		 *
+		 * DaoUtil.addQueryParams(query, filters);
+		 *
+		 * final Long count = query.uniqueResult();
+		 * session.getTransaction().commit(); return count.intValue();
+		 */
 	}
 
 	// save
@@ -239,15 +234,15 @@ public class StoreRecDAO {
 
 		final Session session = this.sessionFactory.openSession();
 		session.beginTransaction();
-		
+
 		// session.get(StoreRecommendation.class, id);
 
 		final CriteriaBuilder builder = session.getCriteriaBuilder();
 		final CriteriaQuery<StoreRecommendation> criteria = builder.createQuery(StoreRecommendation.class);
 		final Root<StoreRecommendation> root = criteria.from(StoreRecommendation.class);
-		
+
 		criteria.select(root).where(builder.equal(root.get("id"), id));
-		
+
 		final StoreRecommendation sr = session.createQuery(criteria).getSingleResult();
 
 		return sr;
@@ -258,21 +253,20 @@ public class StoreRecDAO {
 	 */
 
 	public List<StoreRecommendation> testFilterCriteria(final Map<String, Object> filters,
-			final Map<String, SortOrder> sortBy) 
-	{
-		
+			final Map<String, SortOrder> sortBy) {
+
 		System.out.println("StoreRecDAO/testFilterCriteria");
 		final Session session = this.sessionFactory.openSession();
 		session.beginTransaction();
 
 		// create CriteriaQuery
-		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,session, filters, sortBy);
+		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
+				session, filters, sortBy,false);
 		final List<StoreRecommendation> sr = session.createQuery(criteria).getResultList();
 
 		return sr;
 	}
 
-	
 	// update
 	public boolean update(final StoreRecommendation sr) {
 		boolean result = true;

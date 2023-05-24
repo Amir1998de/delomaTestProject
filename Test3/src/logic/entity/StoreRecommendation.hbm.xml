@@ -31,5 +31,9 @@
     <property name="timeCreated" type="timestamp" update="false">
 
     </property>
+    
+       <property name="priority" type="int" >
+
+    </property>
   </class>
 </hibernate-mapping>
