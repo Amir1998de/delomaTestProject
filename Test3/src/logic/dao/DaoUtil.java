@@ -120,10 +120,16 @@ public class DaoUtil {
 			final String field = entry.getKey();
 			final Object value = entry.getValue();
 			// predicates.add(builder.equal(root.get(field), value));
-
+			
+			// log field =/like value (value.class)
+			
+			// String with like
 			if (value instanceof String) {
 				predicates.add(builder.like(root.get(field), "%" + value + "%"));
-			} else {
+			} 
+			// equal
+			else {
+				System.out.println("DaoUtil/createCriteriaWhere.field : " + field);
 				predicates.add(builder.equal(root.get(field), value));
 			}
 

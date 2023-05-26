@@ -51,7 +51,8 @@
                         <f:validateLength minimum="10" />
                         </p:inputTextarea>
                     </div>
-                    
+        <!-- description /-->      
+             
                     <div class="field">
                         <p:outputLabel for="severity" value="Severity"/>
                         <p:selectOneRadio id="severity" label="Severity" value="#{recommendationBean.selectedItem.severity}"
@@ -65,18 +66,31 @@
                   	  
                       <p:selectBooleanCheckbox id="active" label="Active" value="#{recommendationBean.selectedItem.active}">Active</p:selectBooleanCheckbox>
                     </div> 
+                    
+        <!-- Date -->
+                       
+                  <div class="field">  
+                    <p:outputLabel  value="TimeCreated"/>    
+                      <h:panelGrid columns="1" style="margin-bottom: 10px">      
+			            <p:inputText id="timeCreated" value="#{recommendationBean.selectedItem.timeCreated}" readonly="true"> 
+			            	<f:convertDateTime pattern = "dd-mm-yyyy" />
+			            </p:inputText>
+			          </h:panelGrid>
+			      </div>       
+		<!-- Date /-->
                      
-                       <!-- Priority -->
+        <!-- Priority -->    
                   <div class="field">  
                     <p:outputLabel  value="Priority"/>          
                     <h:panelGrid columns="1" style="margin-bottom: 10px">
                     
 			            <p:inputText id="priority" value="#{recommendationBean.selectedItem.priority}" />
-			            
-			            
-			            
 			        </h:panelGrid>
-            	 </div>    
+            	 </div>        
+	     <!-- Priority /-->
+			            
+			            
+			       
               
                 </p:outputPanel>
             </p:outputPanel>
@@ -98,6 +112,13 @@
 
     </h:form>
     
+		    <style>
+		    .ui-filter-column .ui-column-customfilter .custom-filter {
+		        width: 100%;
+		        box-sizing: border-box;
+		    }
+		</style>
+    
       <h2>Table - Not lazy</h2>
               
               
@@ -105,7 +126,7 @@
 	 		
 				    <div class="my-table">
 				    
-				        <p:dataTable id="tblRec" var="tblVarRec" value="#{recommendationBean.items}" 
+				        <p:dataTable id="tblRec" var="tblVarRec" value="#{recommendationBean.items}" widgetVar="tblwidgetVarRec"
 				         paginator="true" rows="5" selectionMode="single" rowKey="#{tblVarRec.id}" paginatorPosition="bottom" selection="#{recommendationBean.selectedItem}">
 
 				            <p:column headerText="Name" sortBy="#{tblVarRec.name} " filterBy="#{tblVarRec.name}" >
@@ -116,18 +137,46 @@
 				                <h:outputText value="#{tblVarRec.description}" />
 				            </p:column>
 				
-				         <p:column headerText="Severity" sortBy="#{tblVarRec.severity} " filterBy="#{tblVarRec.severity}">
+				
+				 <!-- Severity -->
+				         <p:column field="severity" headerText="Severity" sortBy="#{tblVarRec.severity} " filterMatchMode="exact">
+				
+				         		<f:facet name="filter">
+				                    <p:selectOneMenu onchange="PF('tblwidgetVarRec').filter()" styleClass="ui-custom-filter">
+				                        <f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
+				                       
+				                          <f:selectItems value="#{recommendationBean.severity}" />  
+				                    </p:selectOneMenu>
+				                </f:facet>
 				                <h:outputText value="#{tblVarRec.severity}" />
-				            </p:column>
-				            
+				                  
+				            </p:column>   
+				  <!-- Severity /-->
+				  
+				  <!-- Active -->          
 				          <p:column headerText="Active" sortBy="#{tblVarRec.active} " filterBy="#{tblVarRec.active}">
 				                <h:outputText value="#{tblVarRec.active}" />
 				            </p:column>
-				            
+				  <!-- Active /-->
+				    
+				  <!-- TimeCreated -->       
+				            <p:column headerText="TimeCreated " sortBy="#{tblVarRec.timeCreated} " filterBy="#{tblVarRec.timeCreated}">
+				                <f:facet name="filter">
+                   					 <p:datePicker  onchange="PF('tblwidgetVarRec').filter()" />
+               						 </f:facet>
+                
+				                <h:outputText value="#{tblVarRec.timeCreated}" >
+				                	<f:convertDateTime pattern = "dd.MM.yyyy" />
+				                </h:outputText>
+				                
+				            </p:column>
+				  <!-- TimeCreated /--> 
+				  
+				  <!-- Priority -->       
 				            <p:column headerText="Priority " sortBy="#{tblVarRec.priority} " filterBy="#{tblVarRec.priority}">
 				                <h:outputText value="#{tblVarRec.priority}" />
 				            </p:column>
-				            
+				  <!-- Priority /-->           
 				         <p:column exportable="false">
 				
 				   			 <!-- Edit -->
@@ -176,7 +225,7 @@
     	
     	<h:form id="my-table">
 	 		<div class="my-table">
-			 	<p:dataTable var="tblVarRec" value="#{lazyViewBean.lazyModel}" paginator="true" rows="4" selection="#{lazyViewBean.selectedRecommendation}" 
+			 	<p:dataTable var="tblVarRec" widgetVar="tblWvarRec" value="#{lazyViewBean.lazyModel}" paginator="true" rows="4" selection="#{lazyViewBean.selectedRecommendation}" 
 			 	 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink}">
 		                     
 				    <p:column headerText="Name" sortBy="#{tblVarRec.name}" filterBy="#{tblVarRec.name}">
@@ -187,9 +236,24 @@
 		                <h:outputText style="vertical-align: middle; margin-left: .5rem"
 		                              value="#{tblVarRec.description}"/>
 		            </p:column>
-		            <p:column headerText="Severity" sortBy="#{tblVarRec.severity}" filterBy="#{tblVarRec.severity}">
-		                <h:outputText value="#{tblVarRec.severity}"/>
-		            </p:column>
+		            
+
+		            
+				 <!-- Severity -->
+				         <p:column field="severity" headerText="Severity" sortBy="#{tblVarRec.severity} " filterMatchMode="exact">
+				         
+				         		<f:facet name="filter">
+				                    <p:selectOneMenu onchange="PF('tblWvarRec').filter()" styleClass="ui-custom-filter" converter="omnifaces.GenericEnumConverter">
+				                       <f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
+				                       <f:selectItems value="#{lazyViewBean.severities}" />  
+				                    </p:selectOneMenu>
+				                </f:facet>
+				                <h:outputText value="#{tblVarRec.severity}" />
+				                  
+				            </p:column>
+				            
+				 <!-- Severity /-->		            
+				  
 		            <p:column headerText="Active" sortBy="#{tblVarRec.active}"
 		                      filterBy="#{tblVarRec.active}">
 		               

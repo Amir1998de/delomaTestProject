@@ -32,7 +32,7 @@ public class StoreRecDAO {
 		final Map<String, Object> filters = new HashMap<>();
 
 		final Map<String, SortOrder> sorts = new HashMap<>();
-		filters.put("name", "test");
+		filters.put("severity", logic.entity.Severity.INFO);
 		// filters.put("description", "D");
 		sorts.put("name", SortOrder.ASCENDING);
 		// sorts.put("description", SortOrder.DESCENDING);
@@ -40,7 +40,7 @@ public class StoreRecDAO {
 		final StoreRecDAO dao = new StoreRecDAO(SessionFactoryBean.createSessionFactory());
 
 		// 1. test creiteria single
-		final StoreRecommendation storeRecCriteria = dao.testFilterCriteria(86);
+		final StoreRecommendation storeRecCriteria = dao.testFilterCriteria(85);
 		System.out.println(storeRecCriteria.getName());
 
 		// 2. test criteria list dynamic
@@ -178,23 +178,19 @@ public class StoreRecDAO {
 		session.beginTransaction();
 
 		// create CriteriaQuery
-		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
+		/*final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
 				session, filters, null, true);
 		// criteria
-		return session.createQuery(criteria).getResultList().size();
+		return session.createQuery(criteria).getResultList().size(); */
 
-		/*
-		 * // createHql -> Select / where / null final String hql =
-		 * DaoUtil.createHql(StoreRecommendation.class, "sr", true, filters,
-		 * null);
-		 *
-		 * final Query<Long> query = session.createQuery(hql, Long.class);
-		 *
-		 * DaoUtil.addQueryParams(query, filters);
-		 *
-		 * final Long count = query.uniqueResult();
-		 * session.getTransaction().commit(); return count.intValue();
-		 */
+		
+		 // createHql -> Select / where / null 
+		final String hql =  DaoUtil.createHql(StoreRecommendation.class, "sr", true, filters, null);
+		  final Query<Long> query = session.createQuery(hql, Long.class);
+		  DaoUtil.addQueryParams(query, filters);
+		  final Long count = query.uniqueResult();
+		  session.getTransaction().commit(); return count.intValue();
+		 
 	}
 
 	// save

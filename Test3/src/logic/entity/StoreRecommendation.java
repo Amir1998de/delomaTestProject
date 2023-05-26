@@ -12,12 +12,13 @@ import org.hibernate.validator.constraints.Length;
 public class StoreRecommendation {
 
 	public StoreRecommendation(final String name, final String description, @NotNull final Severity severity,
-			final boolean active) {
+			final boolean active,final int priority) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.severity = severity;
 		this.active = active;
+		this.priority = priority;
 
 	}
 

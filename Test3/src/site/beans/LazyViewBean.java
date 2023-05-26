@@ -54,7 +54,7 @@ public class LazyViewBean implements Serializable {
     	 /*
     	  * send a List<StoreRecommendation>
     	  *
-          * this.lazyModel = new LazyStoreRecDataModelMemory(storeRecDAO.getAll()) ;
+          * this.lazyModel = new LazyStoreRecDataModelMemory(storeRecDAO.getAll()) ; xxx
           */
     	 
     	 this.lazyModel = new LazyStoreRecDataModelDAO(storeRecDAO);
@@ -88,7 +88,8 @@ public class LazyViewBean implements Serializable {
 							StoreRecommendation recommendation = new StoreRecommendation(selectedRecommendation.getName(),
 									selectedRecommendation.getDescription(),
 									selectedRecommendation.getSeverity(),
-									selectedRecommendation.isActive());
+									selectedRecommendation.isActive(),
+									selectedRecommendation.getPriority());
 							storeRecDAO.save(recommendation);	 
 							FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Added"));
 							PrimeFaces.current().ajax().update("pageMessages");

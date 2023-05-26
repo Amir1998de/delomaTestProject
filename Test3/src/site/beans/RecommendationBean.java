@@ -39,7 +39,7 @@ public class RecommendationBean implements Serializable {
 	
 	private List<StoreRecommendation> items = null;
     private StoreRecommendation selectedItem;
-    private String testname ;
+    private String testname = "hallo";
 
 	
 	
@@ -68,6 +68,10 @@ public class RecommendationBean implements Serializable {
      * method
      */
     
+    public List<Severity> getseverity() {
+        return Arrays.asList(Severity.values());
+    }
+    
 	public List<StoreRecommendation> getItems() {
 		System.out.print("RecommendationBean.getItems: size: " + this.items.size());
 		return this.items;
@@ -87,10 +91,11 @@ public class RecommendationBean implements Serializable {
     		
     			try {
 	    				if(selectedItem.getId() == 0){
-							StoreRecommendation recommendation = new StoreRecommendation(selectedItem.getName(),
+							StoreRecommendation recommendation = new StoreRecommendation (selectedItem.getName(),
 																						  selectedItem.getDescription(),
 																						  selectedItem.getSeverity(),
-																						  selectedItem.isActive());
+																						  selectedItem.isActive(),
+																						  selectedItem.getPriority());
 							recommendationDAO.save(recommendation);	 
 							FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Added"));
 							PrimeFaces.current().ajax().update("pageMessages");
