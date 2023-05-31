@@ -57,7 +57,7 @@
                         <p:outputLabel for="severity" value="Severity"/>
                         <p:selectOneRadio id="severity" label="Severity" value="#{recommendationBean.selectedItem.severity}"
                             layout="responsive" columns="2" >
-                            <f:selectItems value="#{recommendationBean.severities}" var="varSeverity" 
+                            <f:selectItems value="#{recommendationBean.severity}" var="varSeverity" 
                             	itemValue="#{varSeverity.toString()}" itemLabel="#{varSeverity.toString()}" />
                         </p:selectOneRadio>
                     </div> 
@@ -67,7 +67,7 @@
                       <p:selectBooleanCheckbox id="active" label="Active" value="#{recommendationBean.selectedItem.active}">Active</p:selectBooleanCheckbox>
                     </div> 
                     
-        <!-- Date -->
+        <!-- TimeCreated -->
                        
                   <div class="field">  
                     <p:outputLabel  value="TimeCreated"/>    
@@ -77,7 +77,7 @@
 			            </p:inputText>
 			          </h:panelGrid>
 			      </div>       
-		<!-- Date /-->
+		<!-- TimeCreated /-->
                      
         <!-- Priority -->    
                   <div class="field">  
@@ -89,9 +89,6 @@
             	 </div>        
 	     <!-- Priority /-->
 			            
-			            
-			       
-              
                 </p:outputPanel>
             </p:outputPanel>
             
@@ -145,7 +142,7 @@
 				                    <p:selectOneMenu onchange="PF('tblwidgetVarRec').filter()" styleClass="ui-custom-filter">
 				                        <f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
 				                       
-				                          <f:selectItems value="#{recommendationBean.severity}" />  
+				                         <f:selectItems value="#{recommendationBean.severity}" />  
 				                    </p:selectOneMenu>
 				                </f:facet>
 				                <h:outputText value="#{tblVarRec.severity}" />
@@ -154,19 +151,28 @@
 				  <!-- Severity /-->
 				  
 				  <!-- Active -->          
-				          <p:column headerText="Active" sortBy="#{tblVarRec.active} " filterBy="#{tblVarRec.active}">
+				          <p:column field="active" headerText="Active" sortBy="#{tblVarRec.active} " filterMatchMode="exact">
+						        <f:facet name="filter">
+						             <p:selectOneMenu onchange="PF('tblwidgetVarRec').filter()" styleClass="ui-custom-filter" >
+						             	<f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
+				                        <f:selectItems value="#{['true','false']}" var="item" itemLabel="#{item}"
+				                            itemValue="#{item}" /> 
+						             </p:selectOneMenu>
+						        </f:facet>					          
 				                <h:outputText value="#{tblVarRec.active}" />
+				                
 				            </p:column>
 				  <!-- Active /-->
 				    
 				  <!-- TimeCreated -->       
-				            <p:column headerText="TimeCreated " sortBy="#{tblVarRec.timeCreated} " filterBy="#{tblVarRec.timeCreated}">
+				            <p:column field="timeCreated" headerText="TimeCreated " sortBy="#{tblVarRec.timeCreated} " filterBy="#{tblVarRec.timeCreated}">
 				                <f:facet name="filter">
-                   					 <p:datePicker  onchange="PF('tblwidgetVarRec').filter()" />
+                   					 <p:datePicker  onchange="PF('tblwidgetVarRec').filter()" 
+                   					  pattern="dd.MM.yyyy" showTime="true"/>
                						 </f:facet>
                 
 				                <h:outputText value="#{tblVarRec.timeCreated}" >
-				                	<f:convertDateTime pattern = "dd.MM.yyyy" />
+				                	<f:convertDateTime pattern = "dd.MM.yyyy HH:mm:ss"  timeZone="GMT+2"  />
 				                </h:outputText>
 				                
 				            </p:column>
@@ -245,22 +251,49 @@
 				         		<f:facet name="filter">
 				                    <p:selectOneMenu onchange="PF('tblWvarRec').filter()" styleClass="ui-custom-filter" converter="omnifaces.GenericEnumConverter">
 				                       <f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
-				                       <f:selectItems value="#{lazyViewBean.severities}" />  
+				                       <f:selectItems value="#{lazyViewBean.severity}" />  
 				                    </p:selectOneMenu>
 				                </f:facet>
 				                <h:outputText value="#{tblVarRec.severity}" />
 				                  
 				            </p:column>
 				            
-				 <!-- Severity /-->		            
+				 <!-- Severity /-->		
+				 
+          
 				  
-		            <p:column headerText="Active" sortBy="#{tblVarRec.active}"
-		                      filterBy="#{tblVarRec.active}">
-		               
-		                <h:outputText style="vertical-align: middle; margin-left: .5rem"
-		                              value="#{tblVarRec.active}"/>
-		            </p:column>
-		            
+				  <!-- Active -->          
+				          <p:column field="active" headerText="Active" sortBy="#{tblVarRec.active} " filterMatchMode="exact">
+						        <f:facet name="filter">
+						        <p:triStateCheckbox  onchange="PF('tblWvarRec').filter()" ></p:triStateCheckbox>
+						        
+						           <!--    <p:selectOneMenu onchange="PF('tblWvarRec').filter()" styleClass="ui-custom-filter" converter="javax.faces.Boolean" >
+						             	<f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
+				                        <f:selectItems value="#{['true','false']}" var="item" itemLabel="#{item}"
+				                            itemValue="#{item}" /> 
+						             </p:selectOneMenu>
+						             
+						             -->
+						        </f:facet>					          
+				                <h:outputText value="#{tblVarRec.active}" />
+				                
+				            </p:column>
+				  <!-- Active /-->
+		           
+				  <!-- TimeCreated -->       
+				            <p:column field="timeCreated" headerText="TimeCreated " sortBy="#{tblVarRec.timeCreated} " filterMatchMode="between">
+				                <f:facet name="filter">
+                   					 <p:datePicker converter="javax.faces.DateTime" onchange="PF('tblWvarRec').filter()"
+                   					  pattern="dd.MM.yyyy" selectionMode="range" />
+               					</f:facet>
+                
+				                <h:outputText value="#{tblVarRec.timeCreated}" >
+				                	<f:convertDateTime pattern = "dd.MM.yyyy HH:mm"  timeZone="GMT+2"  />
+				                </h:outputText>
+				                
+				            </p:column>
+				  <!-- TimeCreated /-->   		            
+		           
 		              <!-- Priority -->
 		         <p:column headerText="Priority" sortBy="#{tblVarRec.priority}"
 		                      filterBy="#{tblVarRec.priority}">

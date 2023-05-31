@@ -68,9 +68,7 @@ public class RecommendationBean implements Serializable {
      * method
      */
     
-    public List<Severity> getseverity() {
-        return Arrays.asList(Severity.values());
-    }
+
     
 	public List<StoreRecommendation> getItems() {
 		System.out.print("RecommendationBean.getItems: size: " + this.items.size());
@@ -170,8 +168,13 @@ public class RecommendationBean implements Serializable {
 	}
 	
 	
-	public List<Severity> getSeverities() {
+    public List<Severity> getseverity() {
+        return Arrays.asList(Severity.values());
+    } 
+
+    
+	/* public List<Severity> getSeverities() {
 	    return Arrays.asList(Severity.values());
-	}
+	 } */
 
 }

@@ -1,6 +1,8 @@
 package logic.dao;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,6 +19,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.primefaces.model.SortOrder;
+
+import logic.entity.StoreRecommendation;
 
 public class DaoUtil {
 	public DaoUtil() {
@@ -51,7 +55,6 @@ public class DaoUtil {
 	public static <T> void addQueryParams(final Query<T> query, final Map<String, Object> params) {
 		if (params != null && !params.isEmpty()) {
 			for (final Entry<String, Object> entry : params.entrySet()) {
-
 				final String field = entry.getKey();
 				final Object value = entry.getValue();
 				if (value != null) {
@@ -121,12 +124,35 @@ public class DaoUtil {
 			final Object value = entry.getValue();
 			// predicates.add(builder.equal(root.get(field), value));
 			
+			System.out.println("DaoUtil/createCriteriaWhere.field : " + field + "value : " + value + "value.class : " + value.getClass());
 			// log field =/like value (value.class)
 			
 			// String with like
 			if (value instanceof String) {
 				predicates.add(builder.like(root.get(field), "%" + value + "%"));
-			} 
+			}
+			// ArrayList - range Date
+			else if (value instanceof ArrayList) {
+				
+				
+				System.out.println("DaoUtil/createCriteriaWhere.ArrayList   ");
+				
+				ArrayList list = ((ArrayList) value);
+				
+				if(list.size() != 2)
+					throw new UnsupportedOperationException("ArrayList represents range, must contain 2 values");
+				
+				if (!(list.get(0) instanceof Date))
+					throw new UnsupportedOperationException("Arraylist represents range, must contain Date values");
+				
+				Date from = (Date) list.get(0);
+				Date till = (Date)list.get(1);
+					
+				javax.persistence.criteria.Path<Date> path = root.get(field);
+				
+				predicates.add(builder.between(path, from, till));
+				
+			}
 			// equal
 			else {
 				System.out.println("DaoUtil/createCriteriaWhere.field : " + field);
@@ -140,6 +166,8 @@ public class DaoUtil {
 		return predicateAnd;
 	}
 
+
+	
 	/*
 	 * createCriteriaOrderBy
 	 */

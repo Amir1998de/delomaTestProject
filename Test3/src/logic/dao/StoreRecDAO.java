@@ -1,5 +1,9 @@
 package logic.dao;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +32,23 @@ public class StoreRecDAO {
 	 * main
 	 */
 	public static void main(final String[] args) {
+		
+        // Aktuelles Datum und Uhrzeit
+        Date currentDate = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        String formattedCurrentDate = formatter.format(currentDate);
+        System.out.println(formattedCurrentDate);
 
+        // Spezifisches Datum und Uhrzeit
+        Date specificDate = new Date(123, 5, 24, 12, 10, 30); // Jahr: 2022, Monat: Juli (0-basiert), Tag: 15, Stunde: 14, Minute: 30, Sekunde: 45
+        String formattedSpecificDate = formatter.format(specificDate);
+        System.out.println(formattedSpecificDate);
+        
+        
 		final Map<String, Object> filters = new HashMap<>();
 
 		final Map<String, SortOrder> sorts = new HashMap<>();
-		filters.put("severity", logic.entity.Severity.INFO);
+		filters.put("timeCreated", specificDate);
 		// filters.put("description", "D");
 		sorts.put("name", SortOrder.ASCENDING);
 		// sorts.put("description", SortOrder.DESCENDING);
@@ -178,18 +194,18 @@ public class StoreRecDAO {
 		session.beginTransaction();
 
 		// create CriteriaQuery
-		/*final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
+		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
 				session, filters, null, true);
 		// criteria
-		return session.createQuery(criteria).getResultList().size(); */
+		return session.createQuery(criteria).getResultList().size(); 
 
 		
 		 // createHql -> Select / where / null 
-		final String hql =  DaoUtil.createHql(StoreRecommendation.class, "sr", true, filters, null);
+		/*  final String hql =  DaoUtil.createHql(StoreRecommendation.class, "sr", true, filters, null);
 		  final Query<Long> query = session.createQuery(hql, Long.class);
 		  DaoUtil.addQueryParams(query, filters);
 		  final Long count = query.uniqueResult();
-		  session.getTransaction().commit(); return count.intValue();
+		  session.getTransaction().commit(); return count.intValue();*/
 		 
 	}
 
