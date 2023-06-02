@@ -3,8 +3,11 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+       xmlns:comp="http://java.sun.com/jsf/composite/comp">
 	 <h:head>
+	 
+	 
 	    <h:outputStylesheet name="styles/style.css"  />
 	    <title>StoreRecommendation</title>
 	 </h:head>
@@ -109,6 +112,7 @@
 
     </h:form>
     
+    
 		    <style>
 		    .ui-filter-column .ui-column-customfilter .custom-filter {
 		        width: 100%;
@@ -116,7 +120,19 @@
 		    }
 		</style>
     
-      <h2>Table - Not lazy</h2>
+    
+		    
+     <!--  <h2>Table - Not lazy</h2> --> 
+     
+     <!-- headlineComponent x-->
+     
+     	
+     	<comp:headlineComponent id="headlineNotLazy" 
+     		value="Table - Not lazy" level="2" icon="https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_local_phone_48px-64.png" />
+
+		
+     	
+     <!-- headlineComponent /-->
               
               
 	 		<h:form id="formTableMemory">
@@ -227,7 +243,11 @@
       
 
 		<!-- Table Lazy -->
-    	<h2>Table - Lazy</h2>
+     	<comp:headlineComponent 
+     		value="Table - lazy" level="1" icon="https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_local_phone_48px-64.png" />
+
+
+
     	
     	<h:form id="my-table">
 	 		<div class="my-table">
@@ -265,7 +285,9 @@
 				  <!-- Active -->          
 				          <p:column field="active" headerText="Active" sortBy="#{tblVarRec.active} " filterMatchMode="exact">
 						        <f:facet name="filter">
-						        <p:triStateCheckbox  onchange="PF('tblWvarRec').filter()" ></p:triStateCheckbox>
+						        
+						        <p:triStateCheckbox converter="triStateCheckboxConverter" onchange="PF('tblWvarRec').filter()" ></p:triStateCheckbox>
+						        
 						        
 						           <!--    <p:selectOneMenu onchange="PF('tblWvarRec').filter()" styleClass="ui-custom-filter" converter="javax.faces.Boolean" >
 						             	<f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />

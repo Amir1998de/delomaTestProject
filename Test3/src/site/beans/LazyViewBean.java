@@ -148,7 +148,7 @@ public class LazyViewBean implements Serializable {
 		this.selectedRecommendation = selectedRecommendation;
 	}
 	
-    public List<Severity> getseverity() {
+    public List<Severity> getSeverity() {
         return Arrays.asList(Severity.values());
     } 
 

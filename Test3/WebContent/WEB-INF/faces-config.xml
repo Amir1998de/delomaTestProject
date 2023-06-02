@@ -9,5 +9,10 @@
     <resource-handler>org.primefaces.application.resource.PrimeResourceHandler</resource-handler>
 </application>
 -->
-
+	
+	<converter>
+	    <converter-id>triStateCheckboxConverter</converter-id>
+	    <converter-class>site.util.TriStateCheckboxConverter</converter-class>
+	</converter>
+	
 </faces-config>

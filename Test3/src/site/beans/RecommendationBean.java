@@ -168,13 +168,10 @@ public class RecommendationBean implements Serializable {
 	}
 	
 	
-    public List<Severity> getseverity() {
+    public List<Severity> getSeverity() {
         return Arrays.asList(Severity.values());
     } 
 
-    
-	/* public List<Severity> getSeverities() {
-	    return Arrays.asList(Severity.values());
-	 } */
+  
 
 }
