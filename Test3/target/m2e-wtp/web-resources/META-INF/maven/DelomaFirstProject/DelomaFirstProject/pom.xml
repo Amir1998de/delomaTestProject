@@ -8,6 +8,7 @@
     <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
+      <!--  -->
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.5.1</version>
         <configuration>
@@ -50,14 +51,44 @@
 				    <artifactId>commons-collections4</artifactId>
 				    <version>4.4</version>
 				</dependency>
-				
+			
 			<dependency>
 			    <groupId>org.omnifaces</groupId>
 			    <artifactId>omnifaces</artifactId>
 			    <version>3.14.2</version>
 			</dependency>
 			
-		
+			
+			
+			
+			 
+			<dependency>
+			    <groupId>org.primefaces.extensions</groupId>
+			    <artifactId>primefaces-extensions</artifactId>
+			    <version>12.0.0</version>
+			</dependency>
+			<dependency>
+			   <groupId>org.primefaces.extensions</groupId>
+			   <artifactId>resources-monacoeditor</artifactId>
+			   <version>12.0.0</version> 
+			</dependency> 
+	
+	
+			<!-- glassfish included libraries -->
+			<dependency>
+				<groupId>org.glassfish</groupId>
+			    <artifactId>javax.faces</artifactId>
+			    <version>2.3.0</version>
+			    <scope>provided</scope>
+			</dependency>
+			
+			<dependency>
+			    <groupId>javax.validation</groupId>
+			    <artifactId>validation-api</artifactId>
+			    <version>1.1.0.Final</version>
+			    <scope>provided</scope>
+			</dependency>
+			
 					  
 			  
 		</dependencies>

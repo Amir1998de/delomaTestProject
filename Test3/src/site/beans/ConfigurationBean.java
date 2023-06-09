@@ -1,5 +1,6 @@
 package site.beans;
 
+
 import javax.faces.annotation.FacesConfig;
 import javax.faces.annotation.FacesConfig.Version;;
 

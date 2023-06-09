@@ -4,13 +4,20 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-       xmlns:comp="http://java.sun.com/jsf/composite/comp">
+      xmlns:comp="http://java.sun.com/jsf/composite/comp"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:o="http://omnifaces.org/ui" >
+      
 	 <h:head>
-	 
-	 
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
+      
 	    <h:outputStylesheet name="styles/style.css"  />
+	    <h:outputStylesheet name="font-awesome/css/font-awesome.min.css"/>
+	    
+	    <o:importFunctions type="logic.entity.Severity" />
 	    <title>StoreRecommendation</title>
 	 </h:head>
+	 
      <h:body>
 	 	<h1>Store Recommendations - Memory</h1>
 	 	
@@ -22,6 +29,7 @@
 	                action="#{recommendationBean.openNew}" process="@this"
 	                update=":formDialog:manageProductContent" 
 	                oncomplete="PF('manageProductDialogWidgetVar').show()"  >
+	                
                     <p:resetInput target=":formDialog:manageProductContent" />
                 </p:commandButton>
                 </h:form>
@@ -32,75 +40,23 @@
         
         
      <h:form id="formDialog">
-    
+
         <p:dialog id="manageProductDialog" header="Recommendation" showEffect="fade" modal="true" widgetVar="manageProductDialogWidgetVar"
             responsive="true">
-            
-            <p:outputPanel id="manageProductContent" class="ui-fluid">
-            
-       		     <p:messages id="dialogMessages" showDetail="true"/>
-                <p:outputPanel rendered="#{not empty recommendationBean.selectedItem}">
-                    
-                    <div class="field">
-                        <p:outputLabel for="name" value="Name"/>
-                        <p:inputText id="name" value="#{recommendationBean.selectedItem.name}" required="true" />
-                    </div>
-                    
-        <!-- description -->
-                   <div class="field">
-                        <p:outputLabel for="description" value="Description"/>
-                        
-                        <p:inputTextarea id="description" value="#{recommendationBean.selectedItem.description}">
-                        <f:validateLength minimum="10" />
-                        </p:inputTextarea>
-                    </div>
-        <!-- description /-->      
-             
-                    <div class="field">
-                        <p:outputLabel for="severity" value="Severity"/>
-                        <p:selectOneRadio id="severity" label="Severity" value="#{recommendationBean.selectedItem.severity}"
-                            layout="responsive" columns="2" >
-                            <f:selectItems value="#{recommendationBean.severity}" var="varSeverity" 
-                            	itemValue="#{varSeverity.toString()}" itemLabel="#{varSeverity.toString()}" />
-                        </p:selectOneRadio>
-                    </div> 
 
-                  <div class="field">
-                  	  
-                      <p:selectBooleanCheckbox id="active" label="Active" value="#{recommendationBean.selectedItem.active}">Active</p:selectBooleanCheckbox>
-                    </div> 
-                    
-        <!-- TimeCreated -->
-                       
-                  <div class="field">  
-                    <p:outputLabel  value="TimeCreated"/>    
-                      <h:panelGrid columns="1" style="margin-bottom: 10px">      
-			            <p:inputText id="timeCreated" value="#{recommendationBean.selectedItem.timeCreated}" readonly="true"> 
-			            	<f:convertDateTime pattern = "dd-mm-yyyy" />
-			            </p:inputText>
-			          </h:panelGrid>
-			      </div>       
-		<!-- TimeCreated /-->
-                     
-        <!-- Priority -->    
-                  <div class="field">  
-                    <p:outputLabel  value="Priority"/>          
-                    <h:panelGrid columns="1" style="margin-bottom: 10px">
-                    
-			            <p:inputText id="priority" value="#{recommendationBean.selectedItem.priority}" />
-			        </h:panelGrid>
-            	 </div>        
-	     <!-- Priority /-->
-			            
-                </p:outputPanel>
-            </p:outputPanel>
+            <h:panelGroup id="manageProductContent">
+	            <comp:recommendationFormComponent value="#{recommendationBean.selectedItem}"
+	            	rendered="#{recommendationBean.selectedItem ne null}"/>
+            </h:panelGroup>
+            
+           
             
             <!-- save -->
     		 <f:facet name="footer">
                 <p:commandButton id="btnSave" value="Save" icon="pi pi-check" 
                 	process="manageProductContent @this"
                 	action="#{recommendationBean.saveItem}" 
-                	update="manageProductContent my-table"
+                	update="manageProductContent formTableMemory"
                 />
                <!-- cancel --> 	
                 <p:button value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialogWidgetVar').hide()"
@@ -119,23 +75,20 @@
 		        box-sizing: border-box;
 		    }
 		</style>
-    
+
     
 		    
      <!--  <h2>Table - Not lazy</h2> --> 
      
-     <!-- headlineComponent x-->
-     
-     	
-     	<comp:headlineComponent id="headlineNotLazy" 
-     		value="Table - Not lazy" level="2" icon="https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_local_phone_48px-64.png" />
-
-		
-     	
-     <!-- headlineComponent /-->
+	   	  <!-- headlineComponent x-->
+	     
+	     	<comp:headlineComponent id="headlineNotLazy" 
+	     		value="Table - Not lazy" level="2" icon="pi pi-pencil" />
+	
+	    	 <!-- headlineComponent /-->
               
               
-	 		<h:form id="formTableMemory">
+	 	<h:form id="formTableMemory" >
 	 		
 				    <div class="my-table">
 				    
@@ -200,7 +153,6 @@
 				            </p:column>
 				  <!-- Priority /-->           
 				         <p:column exportable="false">
-				
 				   			 <!-- Edit -->
 			                 <p:commandButton icon="pi pi-pencil" update=":formDialog:manageProductContent"
 			                    oncomplete="PF('manageProductDialogWidgetVar').show()"
@@ -232,7 +184,7 @@
 			            <p:commandButton value="Yes" icon="pi pi-check"
 			                process="@this" 
 			                action="#{recommendationBean.deleteItem}"
-			                update="@form"
+			                update="@form, pageMessages"
 			                oncomplete="PF('deleteProductDialogWidgetVar').hide()" />
 			                
 			            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
@@ -240,129 +192,164 @@
 			                
 			        </p:confirmDialog>
 			</h:form>    
-      
-
-		<!-- Table Lazy -->
-     	<comp:headlineComponent 
-     		value="Table - lazy" level="1" icon="https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_local_phone_48px-64.png" />
 
 
 
-    	
-    	<h:form id="my-table">
-	 		<div class="my-table">
-			 	<p:dataTable var="tblVarRec" widgetVar="tblWvarRec" value="#{lazyViewBean.lazyModel}" paginator="true" rows="4" selection="#{lazyViewBean.selectedRecommendation}" 
-			 	 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink}">
-		                     
-				    <p:column headerText="Name" sortBy="#{tblVarRec.name}" filterBy="#{tblVarRec.name}">
-		                <h:outputText value="#{tblVarRec.name}"/>
-		            </p:column>
-		            <p:column headerText="Description" sortBy="#{tblVarRec.description}" filterBy="#{tblVarRec.description}">
-		               
-		                <h:outputText style="vertical-align: middle; margin-left: .5rem"
-		                              value="#{tblVarRec.description}"/>
-		            </p:column>
-		            
+    
+    <!--  Table - lazy - MasterDetail --> 
+    
+    	<!-- headlineComponent -->
+         	<comp:headlineComponent id="headlinemasterDetail" 
+     		value="Table - MasterDetail - Lazy" level="2" icon="pi pi-desktop" />
+    
+    		
+    <h:form id="formMasterDetail">
+    
+		 <pe:masterDetail id="masterDetail" >
+		      
+			  <f:facet name="header">
+			    
+			      <p:messages showDetail="false" showSummary="true"/>
+			    	 
+			   </f:facet>	
+			        
+			 <!--  level 1 -->       
+			    <pe:masterDetailLevel level="1">
+			    
+			        <f:facet name="label">
+			            <h:outputFormat value="Overview {0}">
+			                <f:param value="tblRecs"/>
+			         	</h:outputFormat>
+			        </f:facet>		
+			       
+					<p:dataTable var="tblVarRec" widgetVar="tblWidgetVarRec" value="#{lazyViewBean.lazyModel}" 
+						paginator="true" paginatorPosition="bottom" rows="4" 
+						selection="#{lazyViewBean.selectedItem}" >
+					
+						 <f:facet name="header">
+							<p:commandButton value="New" icon="pi pi-plus"   
+	                   		      styleClass="edit-button rounded-button ui-button-success" process="@this" 
+	                   		      update="@form">	
+								  <pe:selectDetailLevel contextValue="#{lazyViewBean.createItem}" level="2"/>
+	             			 </p:commandButton> 
+		                 </f:facet>
 
-		            
-				 <!-- Severity -->
-				         <p:column field="severity" headerText="Severity" sortBy="#{tblVarRec.severity} " filterMatchMode="exact">
+		                 <!--  Name -->
+						    <p:column headerText="Name" sortBy="#{tblVarRec.name}" filterBy="#{tblVarRec.name}">
+				                 <h:outputText value="#{tblVarRec.name}"/>
+				            </p:column>
+				         <!--  Name /-->  
 				         
-				         		<f:facet name="filter">
-				                    <p:selectOneMenu onchange="PF('tblWvarRec').filter()" styleClass="ui-custom-filter" converter="omnifaces.GenericEnumConverter">
-				                       <f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
-				                       <f:selectItems value="#{lazyViewBean.severity}" />  
-				                    </p:selectOneMenu>
-				                </f:facet>
-				                <h:outputText value="#{tblVarRec.severity}" />
-				                  
+				         <!--  Description -->
+				            <p:column headerText="Description" sortBy="#{tblVarRec.description}" filterBy="#{tblVarRec.description}">
+				               
+				                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+				                              value="#{tblVarRec.description}"/>
 				            </p:column>
-				            
-				 <!-- Severity /-->		
-				 
-          
-				  
-				  <!-- Active -->          
-				          <p:column field="active" headerText="Active" sortBy="#{tblVarRec.active} " filterMatchMode="exact">
-						        <f:facet name="filter">
-						        
-						        <p:triStateCheckbox converter="triStateCheckboxConverter" onchange="PF('tblWvarRec').filter()" ></p:triStateCheckbox>
-						        
-						        
-						           <!--    <p:selectOneMenu onchange="PF('tblWvarRec').filter()" styleClass="ui-custom-filter" converter="javax.faces.Boolean" >
-						             	<f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
-				                        <f:selectItems value="#{['true','false']}" var="item" itemLabel="#{item}"
-				                            itemValue="#{item}" /> 
-						             </p:selectOneMenu>
-						             
-						             -->
-						        </f:facet>					          
-				                <h:outputText value="#{tblVarRec.active}" />
-				                
-				            </p:column>
-				  <!-- Active /-->
-		           
-				  <!-- TimeCreated -->       
-				            <p:column field="timeCreated" headerText="TimeCreated " sortBy="#{tblVarRec.timeCreated} " filterMatchMode="between">
-				                <f:facet name="filter">
-                   					 <p:datePicker converter="javax.faces.DateTime" onchange="PF('tblWvarRec').filter()"
-                   					  pattern="dd.MM.yyyy" selectionMode="range" />
-               					</f:facet>
-                
-				                <h:outputText value="#{tblVarRec.timeCreated}" >
-				                	<f:convertDateTime pattern = "dd.MM.yyyy HH:mm"  timeZone="GMT+2"  />
-				                </h:outputText>
-				                
-				            </p:column>
-				  <!-- TimeCreated /-->   		            
-		           
-		              <!-- Priority -->
-		         <p:column headerText="Priority" sortBy="#{tblVarRec.priority}"
-		                      filterBy="#{tblVarRec.priority}">
-		               
-		                <h:outputText style="vertical-align: middle; margin-left: .5rem"
-		                              value="#{tblVarRec.priority}"/>
-		            </p:column>
-		            
-		             <!-- Edit -->
-		              <p:column exportable="false">
-			                 <p:commandButton icon="pi pi-pencil" update=":formDialog:manageProductContent"
-			                    oncomplete="PF('manageProductDialogWidgetVar').show()"
-			                    styleClass="edit-button rounded-button ui-button-success" process="@this">
-			                    
-			                    <f:setPropertyActionListener value="#{tblVarRec}" target="#{lazyView.selectedRecommendation}" />
-			                    
-			                    <p:resetInput target=":formDialog:manageProductContent" />
-			                    
-			                </p:commandButton>
-			                <!-- Delete -->
-			                <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
-			                                 process="@this"
-			                                 oncomplete="PF('deleteProductDialogWidgetVar').show()">
-			                                 
-			                    <f:setPropertyActionListener value="#{tblVarRec}" target="#{lazyView.selectedRecommendation}" />
-			                </p:commandButton>
-			            </p:column>
+				         <!--  Description /-->
+				         
+						 <!-- Severity -->
+						         <p:column field="severity" headerText="Severity" sortBy="#{tblVarRec.severity} " filterMatchMode="exact">
+						         
+						         		<f:facet name="filter">
+						                    <p:selectOneMenu onchange="PF('tblWidgetVarRec').filter()" styleClass="ui-custom-filter" converter="omnifaces.GenericEnumConverter">
+						                       <f:selectItem itemLabel="All" itemValue="#{null}" noSelectionOption="true" />
+						                       <f:selectItems value="#{Severity:values()}" />  
+						                    </p:selectOneMenu>
+						                </f:facet>
+						                <h:outputText value="#{tblVarRec.severity}" />
+						                  
+						            </p:column>
+						            
+						 <!-- Severity /-->		
+						 
+						  <!-- Active -->          
+						          <p:column field="active" headerText="Active" sortBy="#{tblVarRec.active} " filterMatchMode="exact">
+								        <f:facet name="filter">
+								        <p:triStateCheckbox converter="triStateCheckboxConverter" onchange="PF('tblWidgetVarRec').filter()" ></p:triStateCheckbox>
+								        </f:facet>					          
+						                <h:outputText value="#{tblVarRec.active}" />
+						                
+						            </p:column>
+						  <!-- Active /-->		
+
+						  <!-- TimeCreated -->       
+						            <p:column field="timeCreated" headerText="TimeCreated " sortBy="#{tblVarRec.timeCreated} " filterMatchMode="between">
+						                <f:facet name="filter">
+		                   					 <p:datePicker converter="javax.faces.DateTime" onchange="PF('tblWidgetVarRec').filter()"
+		                   					  pattern="dd.MM.yyyy" selectionMode="range" />
+		               					</f:facet>
+		                
+						                <h:outputText value="#{tblVarRec.timeCreated}" >
+						                	<f:convertDateTime pattern = "dd.MM.yyyy HH:mm"  timeZone="GMT+2"  />
+						                </h:outputText>
+						                
+						            </p:column>
+						  <!-- TimeCreated /-->   		            
 				           
-              </p:dataTable>
-	 		</div>
-	 				
+				          <!-- Priority -->
+				          
+				         <p:column headerText="Priority" sortBy="#{tblVarRec.priority}"
+				                      filterBy="#{tblVarRec.priority}">
+				               
+				                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+				                              value="#{tblVarRec.priority}"/>
+				            </p:column>
+			          <!-- Priority  /-->
+			          
+			         <p:column exportable="false">
+			   			 <!-- Edit -->
+		                 <p:commandButton icon="pi pi-pencil" styleClass="edit-button rounded-button ui-button-success" process="@this">
+							<f:setPropertyActionListener value="#{tblVarRec}" target="#{lazyViewBean.selectedItem}" />
+		                	<pe:selectDetailLevel contextValue="#{tblVarRec}" level="2"/>
+		                </p:commandButton>
+		                
+		                <!-- Delete -->
+		                <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+		                                 process="@this"
+		                                 
+		                                 oncomplete="PF('deleteProductDialogWidgetVar').show()">
+		                                 
+		                    <f:setPropertyActionListener value="#{tblVarRec}" target="#{lazyViewBean.selectedItem}" />
+		                </p:commandButton>
+		            </p:column>  
+           </p:dataTable> 
+            
+			    </pe:masterDetailLevel>          
+ 		
+			
+			<!--  level 2 --> 	
+				 <pe:masterDetailLevel level="2" contextVar="contextVar" levelLabel="Detail #{contextVar.id}" levelDisabled="true">
 				  
+				 <!--  Detail --> 		
+				  	<h:panelGrid id="pnlmanageDetail">
+		               <comp:recommendationFormComponent value="#{contextVar}" />
+          		    
+				 <!--  Detail /--> 	
 				 
-				    <p:confirmDialog widgetVar="deleteProductDialogWidgetVar" showEffect="fade" width="300"
-			            message="Delete the product?" header="Confirm" severity="warn" >
-			            
-			            <p:commandButton value="Yes" icon="pi pi-check"
-			                process="@this" 
-			                action="#{lazyView.deleteItem}"
-			                update="my-table"
-			                oncomplete="PF('deleteProductDialogWidgetVar').hide()" />
-			                
-			            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
-			                onclick="PF('deleteProductDialogWidgetVar').hide()" />
-			                
-			        </p:confirmDialog>
-			</h:form>
+				 <!--  Save button --> 
+			        <p:commandButton value="Save" 
+	       				 process="pnlmanageDetail"
+	       				 action="#{lazyViewBean.saveItempar(contextVar)}" 
+	       				 update="masterDetail" 
+                        style="margin-top:10px;" icon="pi pi-save">
+			         	<pe:selectDetailLevel level="1"/>
+			        </p:commandButton>
+			        
+			    <!--  add Button /-->    
+			  </h:panelGrid>
+			        				 	
+				  </pe:masterDetailLevel>
+			 <!--  level 2 /--> 	    
+			                 
+		                 
+		     </pe:masterDetail>
+		</h:form> 
+     <!--  Table - lazy - masterDetail /--> 
+
+
+
+
 
 
     </h:body>

@@ -36,7 +36,9 @@ public class LazyViewBean implements Serializable {
 	
 	private LazyDataModel<StoreRecommendation> lazyModel;
 	
-	private StoreRecommendation selectedRecommendation;
+	private StoreRecommendation selectedItem;
+	
+	private StoreRecommendation createItem = new StoreRecommendation();
 	
 	@Inject
 	@ManagedProperty(value="#{sessionFactoryBean.sessionFactory}")
@@ -45,18 +47,15 @@ public class LazyViewBean implements Serializable {
 	/*
 	 * constructor / init 
 	 * 
+	 * 
+	 * 
 	 * nach der Konstruktion eines Managed Beans ausgeführt wird
 	 */
 	
     @PostConstruct
     public void init() {
     	 StoreRecDAO storeRecDAO = new StoreRecDAO(this.sessionFactory);
-    	 /*
-    	  * send a List<StoreRecommendation>
-    	  *
-          * this.lazyModel = new LazyStoreRecDataModelMemory(storeRecDAO.getAll()) ; xxx
-          */
-    	 
+
     	 this.lazyModel = new LazyStoreRecDataModelDAO(storeRecDAO);
     	 
     }
@@ -69,46 +68,43 @@ public class LazyViewBean implements Serializable {
         FacesMessage msg = new FacesMessage("Customer Selected", String.valueOf(event.getObject().getId()));
         FacesContext.getCurrentInstance().addMessage(null, msg);
     }
-    
-	public void openNew() {
-		System.out.print("RecommendationBean.openNew");	
-		this.selectedRecommendation = new StoreRecommendation();
-	}
+
 	
 	/*
      * save
      */
-    public void saveItem() {
-    	System.out.print("RecommendationBean.saveItem");	
+    
+
+public void saveItempar(final StoreRecommendation sr) {
     	
+    	System.out.print("RecommendationBean.saveItem with id x: " + sr.getId());	
+
     		StoreRecDAO storeRecDAO = new StoreRecDAO(this.sessionFactory);
     		
     			try {
-	    				if(selectedRecommendation.getId() == 0){
-							StoreRecommendation recommendation = new StoreRecommendation(selectedRecommendation.getName(),
-									selectedRecommendation.getDescription(),
-									selectedRecommendation.getSeverity(),
-									selectedRecommendation.isActive(),
-									selectedRecommendation.getPriority());
+	    				if(sr.getId() == 0){
+							StoreRecommendation recommendation = new StoreRecommendation(sr.getName(),
+								sr.getDescription(),
+								sr.getSeverity(),
+								sr.isActive(),
+								sr.getPriority());
 							storeRecDAO.save(recommendation);	 
 							FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Added"));
-							PrimeFaces.current().ajax().update("pageMessages");
-							PrimeFaces.current().executeScript("PF('manageProductDialogWidgetVar').hide()");
 	    				}else{
-	    	    			storeRecDAO.update(this.selectedRecommendation);
+	    	    			storeRecDAO.update(sr);
 	    	    			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product updated"));
-	    	                PrimeFaces.current().ajax().update("pageMessages");
-	    	                PrimeFaces.current().executeScript("PF('manageProductDialogWidgetVar').hide()");
 	    	    		}
 					
 				} catch (Exception e) {
-					 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error","Error"));
-			         PrimeFaces.current().ajax().update("formDialog:dialogMessages");
+					 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getLocalizedMessage()));
 			         System.out.print("RecommendationBean.saveItem.ERORR" + e.getMessage()); 
 				}
     			
-    			init();
-    }
+    			// reset
+    			if (sr == createItem)
+    				createItem = new StoreRecommendation();
+  
+    } 
     
     
     /*
@@ -117,18 +113,15 @@ public class LazyViewBean implements Serializable {
     public void deleteItem(){
     	try {
     			StoreRecDAO storeRecDAO = new StoreRecDAO(this.sessionFactory);
-    			storeRecDAO.delete(this.selectedRecommendation);
-    	        this.selectedRecommendation = null;
+    			storeRecDAO.delete(this.selectedItem);
+    	        this.selectedItem = null;
     	        
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product deleted"));
-                PrimeFaces.current().ajax().update("pageMessages");
-                PrimeFaces.current().executeScript("PF('manageProductDialogWidgetVar').hide()");
 			
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.print("RecommendationBean.deleteItem.ERORR" + e.getMessage()); 
 		}
-    	 init();
     }
     
 	
@@ -140,18 +133,20 @@ public class LazyViewBean implements Serializable {
 		return lazyModel;
 	}
 
-	public StoreRecommendation getSelectedRecommendation() {
-		return selectedRecommendation;
+	public StoreRecommendation getSelectedItem()
+	{
+		return selectedItem;
 	}
 
-	public void setSelectedRecommendation(StoreRecommendation selectedRecommendation) {
-		this.selectedRecommendation = selectedRecommendation;
-	}
-	
-    public List<Severity> getSeverity() {
-        return Arrays.asList(Severity.values());
-    } 
+	public void setSelectedItem(StoreRecommendation selectedItem)
+	{
+		this.selectedItem = selectedItem;
+	} 
 
-	
+	  public StoreRecommendation getCreateItem()
+		{
+			return createItem;
+		}
+
 
 }

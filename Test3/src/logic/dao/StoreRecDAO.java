@@ -29,7 +29,7 @@ public class StoreRecDAO {
 	private final SessionFactory sessionFactory;
 
 	/*
-	 * main
+	 * main xx
 	 */
 	public static void main(final String[] args) {
 		

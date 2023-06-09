@@ -167,7 +167,12 @@ public class RecommendationBean implements Serializable {
 		this.selectedItem = selectedItem;
 	}
 	
-	
+	/**
+	 * @deprecated use omnifaces importFunctions instead in markup
+	 * 
+	 * @return
+	 */
+	@Deprecated
     public List<Severity> getSeverity() {
         return Arrays.asList(Severity.values());
     } 

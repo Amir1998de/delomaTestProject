@@ -1,5 +1,6 @@
 package logic.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -9,7 +10,9 @@ import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Length;
 
-public class StoreRecommendation {
+public class StoreRecommendation implements Serializable 
+{
+	private static final long serialVersionUID = -3010187278193039324L;
 
 	public StoreRecommendation(final String name, final String description, @NotNull final Severity severity,
 			final boolean active,final int priority) {
@@ -22,8 +25,8 @@ public class StoreRecommendation {
 
 	}
 
-	@NotNull
-	private int id;
+	// @NotNull
+	private Integer id;
 
 	@NotNull
 	@Column(unique = true)
@@ -32,6 +35,7 @@ public class StoreRecommendation {
 	@NotNull
 	@Pattern(regexp = ".{10,}", message = "description should not be less than 10")
 	@Length(min = 10)
+	// @WordCounter(min=3, minNoun=3)
 	private String description;
 
 	@NotNull
@@ -59,11 +63,11 @@ public class StoreRecommendation {
 
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 
-	public void setId(final int id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 

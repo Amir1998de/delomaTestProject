@@ -14,7 +14,13 @@
    	    <property name="hibernate.show_sql">true</property>
     	<property name="hibernate.format_sql">true</property>
     	<property name="current_session_context_class">thread</property>
+    	
+    	<!-- JDBC connection pool (use the built-in) - TODO check to close each connection in each method -->
+		<property name="connection.pool_size">100</property>
+    	
     	<mapping resource="logic/entity/StoreRecommendation.hbm.xml"/>
+    	
+
         
     </session-factory>
 </hibernate-configuration>
