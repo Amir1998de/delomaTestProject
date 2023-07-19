@@ -44,7 +44,7 @@ public class MainClass {
 	                	  
 	                	 // System.out.println("result : " + recommendationDAO.delete(r)); 
 	            	   r.setDescription("Hallo2");
-	            	   System.out.println("result : " + recommendationDAO.update(r));
+	            	   // System.out.println("result : " + recommendationDAO.update(r));
 	                }
 	                
 	            } 

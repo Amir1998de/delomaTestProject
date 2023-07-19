@@ -239,14 +239,24 @@ public class DaoUtil {
 		return criteria;
 	}
 
-	// save
-	public static void saveEntity(final Object entity, final SessionFactory sf) {
-		System.out.print("StoreRecommendationDAO.save");
-		final Session session = sf.openSession();
-		session.beginTransaction();
-		session.save(entity);
-		session.getTransaction().commit();
 
+	public static void run(Session session, Runnable run)
+	{
+		try {
+			session.beginTransaction();
+			
+			run.run();
+
+			session.getTransaction().commit();
+
+		} catch (final Exception e) {
+			
+			if (session.getTransaction() != null)
+				session.getTransaction().rollback();
+
+		} finally {
+			session.close();
+		}
 	}
-
+	
 }

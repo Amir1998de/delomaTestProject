@@ -1,0 +1,96 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core">
+
+		<!-- INTERFACE h-->
+		<composite:interface shortDescription="">
+		
+			<composite:attribute name="value" required="true" type="logic.entity.StoreRecommendation"
+				shortDescription="" />
+			
+		</composite:interface>
+
+		<!-- IMPLEMENTATION -->
+		<composite:implementation>
+			
+			<!-- imports -->
+			<o:importFunctions type="logic.entity.Severity" />
+			
+			<!-- params -->
+			
+			<!-- component -->
+            <div id="#{cc.attrs.clientId}" class="ui-fluid"> 
+            
+       		     <p:messages id="dialogMessages" showDetail="true" redisplay="false" skipDetailIfEqualsSummary="true"/>
+                 
+                    
+                    <div class="field"  style="margin-bottom:  10px">
+                        <p:outputLabel for="name" value="Name"/>
+                        <p:inputText id="name" value="#{cc.attrs.value.name}" required="true" />
+                    </div>
+                    
+        <!-- description -->
+                   <div class="field"  style="margin-bottom:  10px">
+                        <p:outputLabel for="description" value="Description"/>
+                        
+                        <p:inputTextarea id="description" value="#{cc.attrs.value.description}">
+                        	<!--  <f:validator validatorId="customTextareaValidator"/> -->
+                        	<f:validateLength minimum="10" />
+
+                        </p:inputTextarea>
+                    </div>
+        <!-- description /-->      
+        
+         <!-- severity --> 
+   			   <div class="field" style="margin-bottom:  10px">
+	         		
+		                <p:outputLabel for="severity" value="Severity"/>
+	                    <p:selectOneMenu id="severity"  value="#{cc.attrs.value.severity}">
+	                    
+                           <f:selectItems value="#{Severity:values()}"  /> 
+                            	
+	                    </p:selectOneMenu>
+	                
+       		   </div>
+ 
+
+
+			<!-- Active -->	
+                  <div class="field"  style="margin-bottom:  10px">
+                  	  
+                      <p:selectBooleanCheckbox id="active" label="Active" value="#{cc.attrs.value.active}">Active</p:selectBooleanCheckbox>
+                    </div> 
+                    
+        <!-- TimeCreated -->
+                       
+                  <div class="field"  style="margin-bottom:  10px">  
+                    <p:outputLabel  value="TimeCreated"/>    
+                      <h:panelGrid columns="1" style="margin-bottom: 10px">      
+			            <p:inputText id="timeCreated" value="#{cc.attrs.value.timeCreated}" readonly="true"> 
+			            	<f:convertDateTime pattern = "dd-mm-yyyy" />
+			            </p:inputText>
+			          </h:panelGrid>
+			      </div>       
+		<!-- TimeCreated /-->
+                     
+        <!-- Priority -->    
+                  <div class="field"  style="margin-bottom:  10px">  
+                    <p:outputLabel  value="Priority"/>          
+                    <h:panelGrid columns="1" style="margin-bottom: 10px">
+                    
+			            <p:spinner id="priority" value="#{cc.attrs.value.priority}" />
+			        </h:panelGrid>
+            	 </div>        
+	     <!-- Priority /-->
+			            
+               
+            </div>
+						
+		</composite:implementation>
+
+</html>

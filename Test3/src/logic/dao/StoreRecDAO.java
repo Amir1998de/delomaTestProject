@@ -14,6 +14,7 @@ import javax.persistence.criteria.Root;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.primefaces.model.SortOrder;
 
@@ -31,14 +32,14 @@ public class StoreRecDAO {
 	/*
 	 * main xx
 	 */
-	public static void main(final String[] args) {
-		
+	public static void main(String[] args) {
+		System.out.println("---------------------------------------------------");
         // Aktuelles Datum und Uhrzeit
         Date currentDate = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         String formattedCurrentDate = formatter.format(currentDate);
         System.out.println(formattedCurrentDate);
-
+       
         // Spezifisches Datum und Uhrzeit
         Date specificDate = new Date(123, 5, 24, 12, 10, 30); // Jahr: 2022, Monat: Juli (0-basiert), Tag: 15, Stunde: 14, Minute: 30, Sekunde: 45
         String formattedSpecificDate = formatter.format(specificDate);
@@ -57,11 +58,14 @@ public class StoreRecDAO {
 
 		// 1. test creiteria single
 		final StoreRecommendation storeRecCriteria = dao.testFilterCriteria(85);
-		System.out.println(storeRecCriteria.getName());
+		System.out.println("last Description : "+storeRecCriteria.getDescription());
+		storeRecCriteria.setDescription("Test test Tessdfst");
+		dao.update(storeRecCriteria);
 
+		
 		// 2. test criteria list dynamic
 		final List<StoreRecommendation> storeRecsCriteria = dao.testFilterCriteria(filters, sorts);
-
+		
 		// sysstem out
 
 		storeRecsCriteria.forEach(action -> System.out
@@ -108,36 +112,45 @@ public class StoreRecDAO {
 	 * @param sr
 	 * @return
 	 */
-	public boolean delete(final StoreRecommendation sr) {
-		boolean result = true;
+	public void delete(final StoreRecommendation sr) 
+	{
 		final Session session = this.sessionFactory.openSession();
 
-		try {
-			session.beginTransaction();
-			session.remove(sr);
-			session.getTransaction().commit();
-
-		} catch (final Exception e) {
-			result = false;
-			if (session.getTransaction() != null) {
-				session.getTransaction().rollback();
-			}
-
-		} finally {
-			session.close();
-		}
-
-		return result;
+		Runnable run = () -> session.remove(sr);
+		
+		DaoUtil.run(session, run);
 	}
 
 	public List<StoreRecommendation> getAll() {
-
+		
 		final Session session = this.sessionFactory.openSession();
-		session.beginTransaction();
+		
 		final List<StoreRecommendation> storeRecommendations = session
-				.createQuery("FROM StoreRecommendation", StoreRecommendation.class).list();
-		session.getTransaction().commit();
+			.createQuery("FROM StoreRecommendation", StoreRecommendation.class).list();
+		
+		try
+		{
+			session.beginTransaction();
+
+			session.getTransaction().commit();
+			
+			return storeRecommendations;
+			
+		}
+		catch (Exception e)
+		{
+			
+			if (session.getTransaction() != null)
+				session.getTransaction().rollback();
+			
+		}finally {
+			
+			session.close();
+			
+		}
+		
 		return storeRecommendations;
+
 	}
 
 	/**
@@ -150,38 +163,55 @@ public class StoreRecDAO {
 	 * getList
 	 */
 	public List<StoreRecommendation> getList(final int offset, final int pageSize, final Map<String, Object> filters,
-			final Map<String, SortOrder> sortBy) {
+		final Map<String, SortOrder> sortBy) {
+		
 		final Session session = this.sessionFactory.openSession();
-		session.beginTransaction();
-		// CriteriaAPI
+		
+		List<StoreRecommendation> results = null;
 
-		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
-				session, filters, sortBy, false);
-		final Query<StoreRecommendation> query = session.createQuery(criteria);
-		query.setFirstResult(offset);
-		query.setMaxResults(pageSize);
-		System.out.println("StoreRecDAO//getList.CriteriaAPI : ");
-		final List<StoreRecommendation> results = query.getResultList();
-
-		// Query<StoreRecommendation> query = null;
-		// if (criteria)
+		try
 		{
+			session.beginTransaction();
+			
+			// CriteriaAPI
+			final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
+				session, filters, sortBy, false);
+			
+			final Query<StoreRecommendation> query = session.createQuery(criteria);
+			
+			results = query.getResultList();
+			
+			query.setFirstResult(offset);
+			
+			query.setMaxResults(pageSize);
+			
+			session.getTransaction().commit();
+			// Query<StoreRecommendation> query = null;
+			// if (criteria)
+		
+			// setFirst
 
+			// HQL :
+			/*
+			 * // createHql -> Select / where / SortBy final String hql =
+			 * DaoUtil.createHql(StoreRecommendation.class, "sr", false, filters,
+			 * sortBy); final Query<StoreRecommendation> query =
+			 * session.createQuery(hql, StoreRecommendation.class); // add params to
+			 * query DaoUtil.addQueryParams(query, filters);
+			 *
+			 */
+			
+		}catch (Exception e) {
+			
+			if (session.getTransaction() != null)
+				session.getTransaction().rollback();
+			
+		}
+		finally
+		{
+			session.close();
 		}
 
-		// setFirst
-
-		// HQL :
-		/*
-		 * // createHql -> Select / where / SortBy final String hql =
-		 * DaoUtil.createHql(StoreRecommendation.class, "sr", false, filters,
-		 * sortBy); final Query<StoreRecommendation> query =
-		 * session.createQuery(hql, StoreRecommendation.class); // add params to
-		 * query DaoUtil.addQueryParams(query, filters);
-		 *
-		 */
-
-		session.getTransaction().commit();
 		return results;
 	}
 
@@ -190,28 +220,51 @@ public class StoreRecDAO {
 	 *
 	 */
 	public int getRowCount(final Map<String, Object> filters) {
-		final Session session = this.sessionFactory.openSession();
-		session.beginTransaction();
-
-		// create CriteriaQuery
-		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
-				session, filters, null, true);
-		// criteria
-		return session.createQuery(criteria).getResultList().size(); 
-
 		
-		 // createHql -> Select / where / null 
-		/*  final String hql =  DaoUtil.createHql(StoreRecommendation.class, "sr", true, filters, null);
-		  final Query<Long> query = session.createQuery(hql, Long.class);
-		  DaoUtil.addQueryParams(query, filters);
-		  final Long count = query.uniqueResult();
-		  session.getTransaction().commit(); return count.intValue();*/
+		final Session session = this.sessionFactory.openSession();
+		
+		int erg = 0 ;
+		
+		try
+		{
+			session.beginTransaction();
+			
+			// create CriteriaQuery
+			final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
+					session, filters, null, true);
+			// criteria
+			erg = session.createQuery(criteria).getResultList().size(); 
+			
+			 // createHql -> Select / where / null 
+			/*  final String hql =  DaoUtil.createHql(StoreRecommendation.class, "sr", true, filters, null);
+			  final Query<Long> query = session.createQuery(hql, Long.class);
+			  DaoUtil.addQueryParams(query, filters);
+			  final Long count = query.uniqueResult();
+			  session.getTransaction().commit(); return count.intValue();*/
+			
+		}catch (Exception e) {
+			
+			if (session.getTransaction() != null)
+				session.getTransaction().rollback();
+			
+		}
+		finally
+		{
+			session.close();
+		}
+		
+		return erg ; 
 		 
 	}
 
 	// save
-	public void save(final StoreRecommendation storeRecommendation) {
-		DaoUtil.saveEntity(storeRecommendation, this.sessionFactory);
+	public void save(final StoreRecommendation sr) {
+
+		final Session session = this.sessionFactory.openSession();
+		
+		Runnable run = () -> session.save(sr);
+		
+		DaoUtil.run(session, run);
 	}
 
 	/*
@@ -220,22 +273,40 @@ public class StoreRecDAO {
 
 	public List<StoreRecommendation> testFilterHQL(final Map<String, Object> filters,
 			final Map<String, SortOrder> sortBy) {
-
+		
 		final Session session = this.sessionFactory.openSession();
-		session.beginTransaction();
+		
+		List<StoreRecommendation> storeRecommendations = null;
 
-		// createHql -> Select / where / SortBy
-		final String hql = DaoUtil.createHql(StoreRecommendation.class, "sr", false, filters, sortBy);
+		try
+		{
+			session.beginTransaction();
 
-		final Query<StoreRecommendation> query = session.createQuery(hql, StoreRecommendation.class);
+			// createHql -> Select / where / SortBy
+			final String hql = DaoUtil.createHql(StoreRecommendation.class, "sr", false, filters, sortBy);
 
-		// add params to query
-		DaoUtil.addQueryParams(query, filters);
+			final Query<StoreRecommendation> query = session.createQuery(hql, StoreRecommendation.class);
 
-		final List<StoreRecommendation> storeRecommendations = query.list();
+			// add params to query
+			DaoUtil.addQueryParams(query, filters);
 
-		session.getTransaction().commit();
+			storeRecommendations = query.list();
+
+			session.getTransaction().commit();
+			
+		}
+		catch (Exception e)
+		{
+			if (session.getTransaction() != null)
+				session.getTransaction().rollback();
+			
+		}finally {
+			
+			session.close();
+		}
+
 		return storeRecommendations;
+
 	}
 
 	/*
@@ -243,20 +314,38 @@ public class StoreRecDAO {
 	 */
 
 	public StoreRecommendation testFilterCriteria(final long id) {
-
+		
 		final Session session = this.sessionFactory.openSession();
-		session.beginTransaction();
+		
+		 StoreRecommendation sr = null;
+		try
+		{
+			session.beginTransaction();
+			
+			// session.get(StoreRecommendation.class, id);
 
-		// session.get(StoreRecommendation.class, id);
+			final CriteriaBuilder builder = session.getCriteriaBuilder();
+			
+			final CriteriaQuery<StoreRecommendation> criteria = builder.createQuery(StoreRecommendation.class);
+			
+			final Root<StoreRecommendation> root = criteria.from(StoreRecommendation.class);
 
-		final CriteriaBuilder builder = session.getCriteriaBuilder();
-		final CriteriaQuery<StoreRecommendation> criteria = builder.createQuery(StoreRecommendation.class);
-		final Root<StoreRecommendation> root = criteria.from(StoreRecommendation.class);
+			criteria.select(root).where(builder.equal(root.get("id"), id));
 
-		criteria.select(root).where(builder.equal(root.get("id"), id));
+			sr = session.createQuery(criteria).getSingleResult();
 
-		final StoreRecommendation sr = session.createQuery(criteria).getSingleResult();
-
+		
+		}
+		catch (Exception e)
+		{
+			if (session.getTransaction() != null)
+				session.getTransaction().rollback();
+			
+		}finally {
+			
+			session.close();
+		}
+		
 		return sr;
 	}
 
@@ -266,41 +355,49 @@ public class StoreRecDAO {
 
 	public List<StoreRecommendation> testFilterCriteria(final Map<String, Object> filters,
 			final Map<String, SortOrder> sortBy) {
-
-		System.out.println("StoreRecDAO/testFilterCriteria");
+		
 		final Session session = this.sessionFactory.openSession();
-		session.beginTransaction();
+		
+		List<StoreRecommendation> sr = null;
+		
+		try
+		{
+			session.beginTransaction();
 
-		// create CriteriaQuery
-		final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
-				session, filters, sortBy,false);
-		final List<StoreRecommendation> sr = session.createQuery(criteria).getResultList();
+			// create CriteriaQuery
+			final CriteriaQuery<StoreRecommendation> criteria = DaoUtil.createCriteriaList(StoreRecommendation.class,
+																											 session, 
+																											 filters, 
+																											  sortBy,
+																										  	  false);
+			
+			sr = session.createQuery(criteria).getResultList();
 
+
+		}
+		catch (Exception e)
+		{
+			
+			if (session.getTransaction() != null)
+				session.getTransaction().rollback();
+			
+		}finally {
+			
+			session.close();
+		}
+		
 		return sr;
+
 	}
 
 	// update
-	public boolean update(final StoreRecommendation sr) {
-		boolean result = true;
+	public void update(final StoreRecommendation sr) {
+		
 		final Session session = this.sessionFactory.openSession();
 
-		try {
-			session.beginTransaction();
-			session.update(sr);
-			session.getTransaction().commit();
-
-		} catch (final Exception e) {
-			result = false;
-			if (session.getTransaction() != null) {
-				session.getTransaction().rollback();
-			}
-
-		} finally {
-			session.close();
-		}
-
-		return result;
-
+		Runnable run = () -> session.update(sr);
+		
+		DaoUtil.run(session, run);
 	}
 
 	/*

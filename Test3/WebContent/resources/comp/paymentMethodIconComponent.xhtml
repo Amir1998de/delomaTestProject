@@ -1,0 +1,46 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core">
+
+		<!-- INTERFACE h-->
+		<composite:interface shortDescription="">
+		
+		<composite:attribute name="paymentMethod" required="true" type="logic.entity.PaymentMethod"
+				shortDescription="" />
+				
+		<composite:attribute name="layout"  type="java.lang.String" default="icon"
+				shortDescription="" />
+				
+			<composite:attribute name="style" type="java.lang.String"
+				shortDescription="CSS style(s) to be applied when this component is rendered." />
+				
+			<composite:attribute name="styleClass"  type="java.lang.String"
+				shortDescription="Space-separated list of CSS style class(es) to be applied when this 
+				 element is rendered. This value must be passed through as the 
+				 'class' attribute on generated markup." />
+ 
+		</composite:interface>
+
+		<!-- IMPLEMENTATION -->
+		<composite:implementation>
+			
+			<!-- imports -->
+			<o:importFunctions type="logic.entity.PaymentMethod" />
+			
+			<!-- params -->
+
+			<f:loadBundle var="constants" basename="site.properties.constants"/>
+			
+		    <!-- use properties file
+				create properties file key : paymentMethod_PAYPAL_vertical -->
+			<ui:param name="selectedIconPath" value="paymentMethod_#{cc.attrs.paymentMethod}_#{cc.attrs.layout}"/>
+
+			<!-- component -->
+ 			<img id="#{cc.clientId}" src="#{constants[selectedIconPath]}" style="#{cc.attrs.style}" /> 
+		</composite:implementation>
+
+</html>

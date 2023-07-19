@@ -80,12 +80,18 @@
 		    
      <!--  <h2>Table - Not lazy</h2> --> 
      
-	   	  <!-- headlineComponent x-->
-	     
+	   	  <!-- headlineComponent -->
 	     	<comp:headlineComponent id="headlineNotLazy" 
 	     		value="Table - Not lazy" level="2" icon="pi pi-pencil" />
-	
-	    	 <!-- headlineComponent /-->
+	    	 	 
+	      <!-- headlineComponent -->
+			<!--<img src="https://cdn-icons-png.flaticon.com/512/174/174861.png" style="width: 50px;height: 50px"/> -->
+			<comp:paymentMethodIconComponent paymentMethod="PAYPAL" layout="icon" style="width: 50px;height: 50px"/>
+			<comp:paymentMethodIconComponent paymentMethod="PAYPAL" layout="vertical" style="width: 50px;height: 50px; margin:5px"/>
+			<comp:paymentMethodIconComponent paymentMethod="PAYPAL" layout="horizental" style="width: 100px;height: 50px"/>
+			<br /><br /><br />
+			
+				
               
               
 	 	<h:form id="formTableMemory" >
@@ -281,7 +287,7 @@
 		               					</f:facet>
 		                
 						                <h:outputText value="#{tblVarRec.timeCreated}" >
-						                	<f:convertDateTime pattern = "dd.MM.yyyy HH:mm"  timeZone="GMT+2"  />
+						                	<f:convertDateTime pattern = "dd.MM.yyyy HH:mm:ss"  timeZone="GMT+2"  />
 						                </h:outputText>
 						                
 						            </p:column>
@@ -332,7 +338,7 @@
 	       				 process="pnlmanageDetail"
 	       				 action="#{lazyViewBean.saveItempar(contextVar)}" 
 	       				 update="masterDetail" 
-                        style="margin-top:10px;" icon="pi pi-save">
+                        style="margin-top:10px;" icon="pi pi-save" >
 			         	<pe:selectDetailLevel level="1"/>
 			        </p:commandButton>
 			        
