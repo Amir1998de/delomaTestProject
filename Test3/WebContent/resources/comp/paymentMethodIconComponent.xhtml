@@ -10,7 +10,7 @@
 		<composite:interface shortDescription="">
 		
 		<composite:attribute name="paymentMethod" required="true" type="logic.entity.PaymentMethod"
-				shortDescription="" />
+				shortDescription="It should be written in capital letters, because it is read from enum" />
 				
 		<composite:attribute name="layout"  type="java.lang.String" default="icon"
 				shortDescription="" />
@@ -35,9 +35,10 @@
 
 			<f:loadBundle var="constants" basename="site.properties.constants"/>
 			
-		    <!-- use properties file
-				create properties file key : paymentMethod_PAYPAL_vertical -->
-			<ui:param name="selectedIconPath" value="paymentMethod_#{cc.attrs.paymentMethod}_#{cc.attrs.layout}"/>
+		    <!-- use properties file create properties file key : paymentMethod_PAYPAL_vertical -->
+			<ui:param name="format" value=".svg"/>
+			<ui:param name="selectedIconPath" value="#{cc.attrs.paymentMethod.toLowerCase()}_#{cc.attrs.layout}#{format}"/>
+			
 
 			<!-- component -->
  			<img id="#{cc.clientId}" src="#{constants[selectedIconPath]}" style="#{cc.attrs.style}" /> 
