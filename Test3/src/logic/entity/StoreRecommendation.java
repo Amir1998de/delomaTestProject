@@ -1,6 +1,9 @@
 package logic.entity;
 
 import java.io.Serializable;
+
+
+
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -10,6 +13,8 @@ import javax.validation.constraints.Pattern;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.constraints.Length;
+
+
 
 import site.util.TestGroup;
 import site.util.WordCounter;
@@ -39,6 +44,7 @@ public class StoreRecommendation implements Serializable
 	@NotNull
 	@Pattern(regexp = ".{10,}", message = "description should not be less than 10")
 	@Length(min = 10)
+	
 	@WordCounter(min=3, minNoun=3)
 	private String description;
 

@@ -36,8 +36,8 @@
 			<f:loadBundle var="constants" basename="site.properties.constants"/>
 			
 		    <!-- use properties file create properties file key : paymentMethod_PAYPAL_vertical -->
-			<ui:param name="format" value=".svg"/>
-			<ui:param name="selectedIconPath" value="#{cc.attrs.paymentMethod.toLowerCase()}_#{cc.attrs.layout}#{format}"/>
+			
+			<ui:param name="selectedIconPath" value="#{cc.attrs.paymentMethod}_#{cc.attrs.layout}"/>
 			
 
 			<!-- component -->

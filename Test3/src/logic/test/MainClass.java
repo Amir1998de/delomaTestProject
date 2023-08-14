@@ -1,12 +1,14 @@
 package logic.test;
 
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import logic.dao.StoreRecDAO;
+import logic.entity.Severity;
 import logic.entity.StoreRecommendation;
 
 public class MainClass {
@@ -22,13 +24,13 @@ public class MainClass {
 	            StoreRecDAO recommendationDAO = new StoreRecDAO(sessionFactory);
 
 	            //** Erstelle eine neue StoreRecommendation-Instanz
-	          /*  StoreRecommendation recommendation = new StoreRecommendation();
+	            StoreRecommendation recommendation = new StoreRecommendation();
 	            recommendation.setName("Backup2");
 	            recommendation.setDescription("Dies ist ein ERORR für Backup2");
 	            recommendation.setSeverity(Severity.ERROR);
 	            recommendation.setActive(false);
 	            recommendation.setTimeCreated(new Date());
-	            recommendationDAO.save(recommendation);  */
+	            recommendationDAO.save(recommendation);  
 
 	  
 	            //** Aktualisiere die StoreRecommendation
@@ -47,7 +49,7 @@ public class MainClass {
 	            	   // System.out.println("result : " + recommendationDAO.update(r));
 	                }
 	                
-	            } 
+	             }   
 
 	            
 	            // dao.getList(...)
